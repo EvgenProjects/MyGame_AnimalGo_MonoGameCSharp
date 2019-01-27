@@ -5,7 +5,7 @@ using MyGraphic_interfaces;
 
 namespace MyGame_interfaces
 {
-	interface IMyLevel
+	public interface IMyLevel
 	{
 		// width/height
 		int LevelWidth { get; }
@@ -27,6 +27,9 @@ namespace MyGame_interfaces
 		void OnNextTurn(long timeInMilliseconds, IMyGame game);
 		bool OnClickMouse(int xMouse, int yMouse, IMyGraphic myGraphic);
 		void OnCreateUnit_WhenDeleteUnitWillAppear(IMyGraphic myGraphic, IMyUnitWillAppear gameUnitWillAppear);
+
+		// level end
+		bool IsLevelEnd();
 
 		// multiplayer
 		int[] GetPlayerIDs();

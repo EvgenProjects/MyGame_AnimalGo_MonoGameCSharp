@@ -4,7 +4,7 @@ using MyGame_interfaces;
 
 namespace MyGame_interfaces
 {
-	interface IMyUnitWillAppear
+	public interface IMyUnitWillAppear
 	{
 		IMyUnit Unit { get; }
 		bool IsNeedDelete { get; }

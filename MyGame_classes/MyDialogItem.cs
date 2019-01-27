@@ -4,7 +4,7 @@ using MyGame_interfaces;
 
 namespace MyGame_classes
 {
-	class MyButton : IMyButton
+	class MyDialogItem : IMyDialogItem
 	{
 		// focus
 		public bool Focus { get; set; }
@@ -12,8 +12,15 @@ namespace MyGame_classes
 		// image
 		public MyPicture MyPicture;
 
-		public MyButton(MyPicture myPicture)
+		// handler
+		public HandlerClickMouse OnHandlerClickMouse { get; set; }
+
+		// offset from Dialog
+		public MyPointF PosSourceFromDialog { get; set; }
+
+		public MyDialogItem(MyPicture myPicture)
 		{
+			PosSourceFromDialog = myPicture.PosSource;
 			MyPicture = myPicture;
 			Focus = false;
 		}
@@ -26,7 +33,7 @@ namespace MyGame_classes
 
 			// focus rectangle
 			if (Focus && myGraphic != null)
-				myGraphic.DrawRectangle(context, MyPicture.GetDrawRect().Inflate(3), new MyColor(0, 0, 255), new MyColor(0, 255, 255), 3 /*line width*/);
+				myGraphic.DrawRectangle(context, MyPicture.GetDrawRect(), new MyColor(0, 0, 255), new MyColor(0, 255, 255), 1 /*line width*/);
 
 			// image
 			MyPicture.OnDraw(context, myGraphic);
@@ -40,19 +47,6 @@ namespace MyGame_classes
 		public virtual MyRectangle GetDrawRect()
 		{
 			return MyPicture.GetDrawRect();
-		}
-
-		public virtual bool OnClickMouse(int xMouse, int yMouse, IMyGraphic myGraphic, IMyLevel gameLevel)
-		{
-			// unfocus all items in gameLevel.Buttons
-			for (int i=0; i< gameLevel.Buttons.Count; i++)
-				gameLevel.Buttons[i].Focus = false;
-
-			// set focus
-			Focus = true;
-
-			// result
-			return true;
 		}
 	}
 }

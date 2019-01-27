@@ -4,7 +4,7 @@ using MyGame_interfaces;
 
 namespace MyGame_interfaces
 {
-	interface IMyButton : IMyShape
+	public interface IMyButton : IMyShape
 	{
 		// focus
 		bool Focus { get; set; }

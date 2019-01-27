@@ -1,6 +1,6 @@
 ﻿namespace MyGraphic_interfaces
 {
-	struct MyColor
+	public struct MyColor
 	{
 		public byte R;
 		public byte G;

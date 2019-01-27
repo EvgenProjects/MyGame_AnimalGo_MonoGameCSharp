@@ -1,6 +1,6 @@
 ﻿namespace MyGame_interfaces
 {
-	interface IMyAnimation : IMyShape
+	public interface IMyAnimation : IMyShape
 	{
 		bool IsNeedDelete { get; }
 

@@ -4,7 +4,7 @@ using MyGame_interfaces;
 
 namespace MyGame_classes
 {
-	class MyUnit_FireOnDistanceIfSeeEnemyUnit : MyUnit
+	class MyUnit_FireOnDistanceIfSeeEnemyUnit : MyUnitAbstract
 	{
 		// Fire preiod
 		protected long LastTimeWhenMadeFireInMilliseconds = 0;
@@ -23,10 +23,10 @@ namespace MyGame_classes
 			return false;
 		}
 
-		public override void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel)
+		public override void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel, bool bMove)
 		{
 			// base
-			base.OnNextTurn(timeInMilliseconds, myGraphic, gameLevel);
+			base.OnNextTurn(timeInMilliseconds, myGraphic, gameLevel, bMove);
 
 			// Trajectory
 			if (Trajectory != null)

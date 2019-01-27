@@ -3,7 +3,7 @@ using MyGraphic_interfaces;
 
 namespace MyGame_interfaces
 {
-	interface IMyTrajectory
+	public interface IMyTrajectory
 	{
 		void Move(ref MyPointF pt);
 	}

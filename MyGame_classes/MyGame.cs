@@ -9,8 +9,13 @@ namespace MyGame_classes
 		// graphic
 		public IMyGraphic Graphic { get; protected set; }
 
-		// level
-		protected IMyLevel GameLevel;
+		// levels
+		private readonly IMyLevel[] _gameLevels;
+		public IMyLevel[] Levels { get { return _gameLevels; } }
+		public int CurrentLevelIndex { get; protected set; }
+
+		// dialog
+		public IMyDialog Dialog { get; set; }
 
 		// time
 		public virtual int GetTimeStepInMilliseconds() { return 20; } // 20 miliseconds
@@ -19,6 +24,9 @@ namespace MyGame_classes
 		public MyGame(IMyGraphic myGraphic)
 		{
 			Graphic = myGraphic;
+		
+			// set levels
+			_gameLevels = new IMyLevel[] { new MyLevel1(), new MyLevel2(), new MyLevel3(), new MyLevel4() };
 		}
 
 		// methods
@@ -43,6 +51,8 @@ namespace MyGame_classes
 			Graphic.LoadImageFromFile("buttons/button_dog.png", (int)enImageType.Button_dog);
 			Graphic.LoadImageFromFile("buttons/shenachi_patrul/button_marshal.png", (int)enImageType.Button_marshal);
 			Graphic.LoadImageFromFile("buttons/shenachi_patrul/button_zuma.png", (int)enImageType.Button_zuma);
+			Graphic.LoadImageFromFile("buttons/button_level_first.png", (int)enImageType.Button_level_first);
+			Graphic.LoadImageFromFile("buttons/button_level_next.png", (int)enImageType.Button_level_next);
 
 			// load images (my heroes)
 			Graphic.LoadImageFromFile("heroes/krolik/krolik_s_lukom.png", (int)enImageType.Heroes_krolik_s_lukom);
@@ -84,15 +94,70 @@ namespace MyGame_classes
 			Graphic.LoadImageFromFile("heroes/fire/morkovka.png", (int)enImageType.Fire_morkovka);
 			Graphic.LoadImageFromFile("heroes/fire/morkovka_splash.png", (int)enImageType.Fire_morkovka_splash);
 
-			// set level
-			GameLevel = new MyLevelImpl();
-			GameLevel.OnLoad(Graphic);
+			// open dialog
+			OpenDialog(new MyDialogStartGame(this));
+		}
+
+		public void OpenDialog(IMyDialog myDialog)
+		{
+			Dialog = myDialog;
+		}
+
+		public virtual void LoadFirstLevel()
+		{
+			CurrentLevelIndex = 0;
+
+			// get cur level
+			IMyLevel myLevel = GetCurLevel();
+
+			// load
+			if (myLevel != null)
+				myLevel.OnLoad(Graphic);
+		}
+
+		public virtual void LoadNextLevel()
+		{
+			CurrentLevelIndex++;
+
+			// get cur level
+			IMyLevel myLevel = GetCurLevel();
+
+			// load
+			if (myLevel!=null)
+				myLevel.OnLoad(Graphic);
+		}
+
+		public virtual IMyLevel GetCurLevel()
+		{
+			// check
+			if (Levels == null || CurrentLevelIndex < 0 || CurrentLevelIndex >= Levels.Length)
+				return null;
+
+			// result
+			return Levels[CurrentLevelIndex];
 		}
 
 		public virtual void OnNextTurn(long timeInMilliseconds)
 		{
-			if (GameLevel != null)
-				GameLevel.OnNextTurn(timeInMilliseconds, this);
+			// if Dialog skip next turn for level objects
+			if (Dialog != null)
+				return;
+
+			// get cur level
+			IMyLevel myLevel = GetCurLevel();
+
+			if (myLevel != null)
+			{
+				// next turn
+				myLevel.OnNextTurn(timeInMilliseconds, this);
+
+				// is level end
+				if (myLevel.IsLevelEnd())
+				{
+					// open dialog
+					OpenDialog(new MyDialogLevelNext(this));
+				}
+			}
 		}
 
 		public virtual void OnChangeWindowSize(int screenWidth, int screenHeight)
@@ -101,26 +166,43 @@ namespace MyGame_classes
 			Graphic.ScreenHeight = screenHeight;
 
 			// calculate stratch
-			Graphic.XStretchCoef = (float)Graphic.ScreenWidth / GameLevel.LevelWidth;
-			Graphic.YStretchCoef = (float)Graphic.ScreenHeight / GameLevel.LevelHeight;
+			Graphic.XStretchCoef = (float)Graphic.ScreenWidth / Levels[CurrentLevelIndex].LevelWidth;
+			Graphic.YStretchCoef = (float)Graphic.ScreenHeight / Levels[CurrentLevelIndex].LevelHeight;
 		}
 
 		public virtual void OnDraw(object context)
 		{
-			if (GameLevel != null)
-				GameLevel.OnDraw(context, Graphic);
+			// get cur level
+			IMyLevel myLevel = GetCurLevel();
+
+			// draw
+			if (myLevel != null)
+				myLevel.OnDraw(context, Graphic);
+
+			// draw dialog
+			if (Dialog != null)
+				Dialog.OnDraw(context, Graphic);
 		}
 
 		public virtual bool OnClickMouse(int xMouse, int yMouse)
 		{
-			bool result = false;
-			if (GameLevel != null)
+			// click on dialog
+			if (Dialog != null)
 			{
-				result = GameLevel.OnClickMouse(xMouse, yMouse, Graphic);
-				if (result)
-					Graphic.SendMessageToReDraw();
+				if (Dialog.OnClickMouse(xMouse, yMouse, Graphic, this))
+					return true;
 			}
-			return result;
+
+			// get cur level
+			IMyLevel myLevel = GetCurLevel();
+
+			// click mouse
+			if (myLevel != null && myLevel.OnClickMouse(xMouse, yMouse, Graphic))
+			{
+				Graphic.SendMessageToReDraw();
+				return true;
+			}
+			return false;
 		}
 	}
 }

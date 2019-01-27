@@ -17,6 +17,9 @@ namespace MyGame_classes
 			if (button == null)
 				return false;
 
+			// get my Level Play
+			MyLevelAbstract myLevelAbstract = gameLevel as MyLevelAbstract;
+
 			// find myHero here
 			IMyUnit myUnit = gameLevel.Units.Find(item =>
 			{
@@ -24,10 +27,10 @@ namespace MyGame_classes
 				if (gameLevel.IsTeam(gameLevel.GetMyPlayerID(), item.PlayerID))
 				{
 					// is same row
-					if ((gameLevel as MyLevelImpl).GetRow(MyPicture.GetSourceRect()) == (gameLevel as MyLevelImpl).GetRow((item as MyUnit).MyPicture.GetSourceRect()))
+					if (myLevelAbstract.GetRow(MyPicture.GetSourceRect()) == myLevelAbstract.GetRow((item as MyUnitAbstract).MyPicture.GetSourceRect()))
 					{
 						// has enemy unit on right
-						if ((gameLevel as MyLevelImpl).GetCol(MyPicture.GetSourceRect()) == (gameLevel as MyLevelImpl).GetCol((item as MyUnit).MyPicture.GetSourceRect()))
+						if (myLevelAbstract.GetCol(MyPicture.GetSourceRect()) == myLevelAbstract.GetCol((item as MyUnitAbstract).MyPicture.GetSourceRect()))
 							return true;
 					}
 				}
@@ -62,6 +65,9 @@ namespace MyGame_classes
 			{
 				gameLevel.Units.Add(new MyUnit_KrolikStayAndFire(myGraphic, gameLevel.GetMyPlayerID(), xCenter, yCenter));
 			}
+
+			// unfocus button
+			button.Focus = false;
 
 			// return
 			return true;

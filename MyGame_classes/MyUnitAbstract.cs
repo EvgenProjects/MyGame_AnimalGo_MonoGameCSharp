@@ -4,7 +4,7 @@ using MyGame_interfaces;
 
 namespace MyGame_classes
 {
-	class MyUnit : IMyUnit
+	abstract class MyUnitAbstract : IMyUnit
 	{
 		// picture
 		public MyPicture MyPicture;
@@ -21,7 +21,7 @@ namespace MyGame_classes
 		// trajectory
 		public IMyTrajectory Trajectory { get; protected set; }
 
-		public MyUnit(int life, int playerID, MyPicture myPicture)
+		public MyUnitAbstract(int life, int playerID, MyPicture myPicture)
 		{
 			MyPicture = myPicture;
 			PlayerID = playerID;
@@ -57,7 +57,7 @@ namespace MyGame_classes
 				Trajectory.Move(ref MyPicture.PosSource);
 		}
 
-		public virtual void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel)
+		public virtual void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel, bool bMove)
 		{
 			// delete unit
 			if (Life <= 0)
@@ -72,10 +72,13 @@ namespace MyGame_classes
 				return;
 
 			// move
-			MoveByTrajectory();
+			if (bMove)
+			{
+				MoveByTrajectory();
 
-			// change sprite index
-			MyPicture.ChangeSpriteIndex(timeInMilliseconds);
+				// change sprite index
+				MyPicture.ChangeSpriteIndex(timeInMilliseconds);
+			}
 		}
 
 		public virtual bool OnClickMouse(int xMouse, int yMouse, IMyGraphic myGraphic)

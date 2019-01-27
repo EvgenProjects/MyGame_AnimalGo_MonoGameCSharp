@@ -1,6 +1,6 @@
 ﻿namespace MyGraphic_interfaces
 {
-	struct MySize
+	public struct MySize
 	{
 		public int Width;
 		public int Height;

@@ -1,6 +1,6 @@
 ﻿namespace MyGraphic_interfaces
 {
-	enum enImageAlign
+	public enum enImageAlign
 	{
 		LeftTop = 1,
 		CenterX_CenterY = 2,

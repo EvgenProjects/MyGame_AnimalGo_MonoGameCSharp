@@ -1,6 +1,6 @@
 ﻿namespace MyGraphic_interfaces
 {
-	interface IMyImageFile
+	public interface IMyImageFile
 	{
 		MySize sizeSource { get; }
 		bool IsLoaded { get; }

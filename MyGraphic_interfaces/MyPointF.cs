@@ -1,6 +1,6 @@
 ﻿namespace MyGraphic_interfaces
 {
-	struct MyPointF
+	public struct MyPointF
 	{
 		public float X;
 		public float Y;

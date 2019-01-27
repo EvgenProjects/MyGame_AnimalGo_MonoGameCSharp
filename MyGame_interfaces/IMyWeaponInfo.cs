@@ -1,6 +1,6 @@
 ﻿namespace MyGame_interfaces
 {
-	interface IMyWeaponInfo
+	public interface IMyWeaponInfo
 	{
 		// Damage
 		int Damage { get; }

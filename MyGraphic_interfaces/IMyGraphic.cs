@@ -1,6 +1,6 @@
 ﻿namespace MyGraphic_interfaces
 {
-	interface IMyGraphic
+	public interface IMyGraphic
 	{
 		IMyImageFile LoadImageFromFile(string pathImage, int ImageID);
 		IMyImageFile FindImage(int imageID);

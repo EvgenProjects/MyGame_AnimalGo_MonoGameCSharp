@@ -1,6 +1,6 @@
 ﻿namespace MyGraphic_interfaces
 {
-	struct MyRectangle
+	public struct MyRectangle
 	{
 		public int X;
 		public int Y;
@@ -13,6 +13,15 @@
 			Y = y;
 			Width = width;
 			Height = height;
+		}
+
+		public MyRectangle Inflate(int size)
+		{
+			X -= size;
+			Y -= size;
+			Width += size*2;
+			Height += size*2;
+			return this;
 		}
 
 		public bool Contains(int x, int y)

@@ -3,7 +3,7 @@ using MyGraphic_interfaces;
 
 namespace MyGame_interfaces
 {
-	interface IMyFire : IMyShape
+	public interface IMyFire : IMyShape
 	{
 		bool IsNeedDelete { get; set; }
 

@@ -5,7 +5,7 @@ using MyGame_classes;
 
 namespace MyGame_classes
 {
-	class MyUnit_StopAndHitIfNearOtherUnit : MyUnit
+	class MyUnit_StopAndHitIfNearOtherUnit : MyUnitAbstract
 	{
 		// weapon info
 		public IMyWeaponInfo WeaponInfo { get; protected set; }
@@ -34,60 +34,60 @@ namespace MyGame_classes
 		public override void MoveByTrajectory()
 		{
 			// Trajectory
-			if (Trajectory != null && CollisionWithUnit == null)
+			if (Trajectory != null)
 				Trajectory.Move(ref MyPicture.PosSource);
 		}
 
-		public override void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel)
+		public override void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel, bool bMove)
 		{
-			// base
-			base.OnNextTurn(timeInMilliseconds, myGraphic, gameLevel);
-
-			// check is valid 
-			if (CollisionWithUnit != null)
+			// find collision by Enemy
+			IMyUnit findCollisionWithUnit = gameLevel.Units.Find(unit =>
 			{
-				IMyUnit unitFindCollision = gameLevel.Units.Find(unit => unit == CollisionWithUnit);
-				if (unitFindCollision == null)
-					CollisionWithUnit = null;
-			}
-
-			// move
-			MoveByTrajectory();
-
-			// get Rect
-			MyRectangle rectSource = MyPicture.GetSourceRect();
-
-			// find collision with my Unit
-			IMyUnit unitFind = gameLevel.Units.Find(item =>
-			{
-				// not team
-				if (!gameLevel.IsTeam(PlayerID, item.PlayerID))
+				MyUnit_StopAndHitIfNearOtherUnit unitTemp = (unit as MyUnit_StopAndHitIfNearOtherUnit);
+				if (unitTemp != null)
 				{
-					//is intersect
-					if (item.GetSourceRect().IntersectsWith(rectSource))
-						return true;
+					return unitTemp.CollisionWithUnit==this;
 				}
 				return false;
 			});
 
-			// collision with unit
-			if (unitFind != null)
+			// find collision by Enemy rect
+			if (findCollisionWithUnit == null)
+			{
+				// get Rect
+				MyRectangle rectSource = MyPicture.GetSourceRect();
+
+				// find collision with my Unit
+				findCollisionWithUnit = gameLevel.Units.Find(item =>
+				{
+					// not team
+					if (!gameLevel.IsTeam(PlayerID, item.PlayerID))
+					{
+						//is intersect
+						if (item.GetSourceRect().IntersectsWith(rectSource))
+							return true;
+					}
+					return false;
+				});
+			}
+
+			// set
+			CollisionWithUnit = findCollisionWithUnit;
+
+			// base
+			bool bNeedMove = CollisionWithUnit == null;
+			base.OnNextTurn(timeInMilliseconds, myGraphic, gameLevel, bNeedMove);
+
+			// make damage
+			if (CollisionWithUnit != null)
 			{
 				if (TimeToMakeDamageNear != 0 && timeInMilliseconds > (LastTimeWhenMakeDamageInMilliseconds + TimeToMakeDamageNear))
 				{
 					// last time
 					LastTimeWhenMakeDamageInMilliseconds = timeInMilliseconds;
 
-					// collision
-					CollisionWithUnit = unitFind;
-
-					// other unit
-					MyUnit_StopAndHitIfNearOtherUnit otherUnit = (unitFind as MyUnit_StopAndHitIfNearOtherUnit);
-					if (otherUnit != null)
-						otherUnit.CollisionWithUnit = this;
-
-					// near damage
-					NeedMakeDamageToUnit(unitFind, myGraphic, gameLevel);
+					// damage
+					NeedMakeDamageToUnit(CollisionWithUnit, myGraphic, gameLevel);
 				}
 			}
 		}

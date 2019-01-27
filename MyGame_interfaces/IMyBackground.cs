@@ -3,7 +3,7 @@ using MyGraphic_interfaces;
 
 namespace MyGame_interfaces
 {
-	interface IMyBackground : IMyShape
+	public interface IMyBackground : IMyShape
 	{
 		// events
 		bool OnClickMouse(int xMouse, int yMouse, IMyGraphic myGraphic, IMyLevel gameLevel);

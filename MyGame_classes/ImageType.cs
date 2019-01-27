@@ -17,6 +17,8 @@
 		Button_marshal,
 		Button_zuma,
 		Button_dog,
+		Button_level_first,
+		Button_level_next,
 
 		// my heroes
 		Heroes_krolik_s_lukom,

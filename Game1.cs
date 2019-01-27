@@ -19,6 +19,7 @@ namespace MyGame_AnimalGo_MonoGame
 		// моя переменная !!!!!
 		MyGraphicMono myGraphic;
 		IMyGame myGame;
+		long PrevTime = 0;
 
 		public Game1()
 		{
@@ -69,6 +70,13 @@ namespace MyGame_AnimalGo_MonoGame
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
 				Exit();
 
+			// skip
+			if (((long)gameTime.TotalGameTime.TotalMilliseconds - PrevTime) < myGame.GetTimeStepInMilliseconds())
+				return;
+			
+			// set prev time
+			PrevTime = (long)gameTime.TotalGameTime.TotalMilliseconds;
+
 			// мое нажатие touch
 			var touches = Microsoft.Xna.Framework.Input.Touch.TouchPanel.GetState();
 			foreach (var touch in touches)
@@ -82,6 +90,7 @@ namespace MyGame_AnimalGo_MonoGame
 			// next
 			myGame.OnNextTurn((long)gameTime.TotalGameTime.TotalMilliseconds);
 
+			// base
 			base.Update(gameTime);
 		}
 

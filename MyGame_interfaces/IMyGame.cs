@@ -3,10 +3,17 @@ using MyGraphic_interfaces;
 
 namespace MyGame_interfaces
 {
-	interface IMyGame
+	public interface IMyGame
 	{
 		// graphic
 		IMyGraphic Graphic { get; }
+
+		// levels
+		IMyLevel[] Levels { get; }
+		int CurrentLevelIndex { get; }
+
+		// dialog
+		IMyDialog Dialog { get; set; }
 
 		// time
 		int GetTimeStepInMilliseconds();
@@ -18,5 +25,9 @@ namespace MyGame_interfaces
 		void OnExit();
 		bool OnClickMouse(int xMouse, int yMouse);
 		void OnChangeWindowSize(int windowWidth, int windowHeight);
+
+		// methods
+		void LoadFirstLevel();
+		void LoadNextLevel();
 	}
 }
