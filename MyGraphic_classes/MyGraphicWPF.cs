@@ -59,17 +59,11 @@ namespace MyGraphic_classes
 		public MyRectangle DrawImage(object context, MyPointF pt, ImageSource imgSource, int imgWidth, int imgHeight, enImageAlign imageAlign, ref MyRectangle RectDraw)
 		{
 			// calculate source x,y
-			float xSource = pt.X;
-			float ySource = pt.Y;
-			if (imageAlign == enImageAlign.CenterX_CenterY)
-			{
-				xSource = xSource - (float)imgWidth / 2;
-				ySource = ySource - (float)imgHeight / 2;
-			}
+			MyPoint posLeftTopSource = ImageAlign.CalculateLeftTopPos(pt, imageAlign, imgWidth, imgHeight);
 
 			// calculate x,y,w,h Draw
-			float xDraw = xSource * XStretchCoef;
-			float yDraw = ySource * YStretchCoef;
+			float xDraw = posLeftTopSource.X * XStretchCoef;
+			float yDraw = posLeftTopSource.Y * YStretchCoef;
 			float wDraw = (float)imgWidth * XStretchCoef;
 			float hDraw = (float)imgHeight * YStretchCoef;
 
@@ -84,8 +78,8 @@ namespace MyGraphic_classes
 
 			// return Source
 			MyRectangle RectSource = new MyRectangle();
-			RectSource.X = (int)xSource;
-			RectSource.Y = (int)ySource;
+			RectSource.X = (int)posLeftTopSource.X;
+			RectSource.Y = (int)posLeftTopSource.Y;
 			RectSource.Width = (int)imgWidth;
 			RectSource.Height = (int)imgHeight;
 			return RectSource;
@@ -153,6 +147,18 @@ namespace MyGraphic_classes
 			return null;
 		}
 
+		public MySize ConvertSourceToScreen(MySize sizeSource)
+		{
+			MySize sizeScreen = new MySize((int)((float)sizeSource.Width * XStretchCoef), (int)((float)sizeSource.Height * YStretchCoef));
+			return sizeScreen;
+		}
+
+		public MyPoint ConvertScreenToSource(MyPoint posScreen)
+		{
+			MyPoint posSource = new MyPoint((int)((float)posScreen.X / XStretchCoef), (int)((float)posScreen.Y / YStretchCoef));
+			return posSource;
+		}
+		
 		// Rectangle cashe
 		protected System.Windows.Media.SolidColorBrush BrushForFillRectangle = new System.Windows.Media.SolidColorBrush();
 		protected System.Windows.Media.SolidColorBrush BrushForBorderRectangle = new System.Windows.Media.SolidColorBrush();

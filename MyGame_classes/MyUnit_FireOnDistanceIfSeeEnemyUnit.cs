@@ -6,6 +6,11 @@ namespace MyGame_classes
 {
 	class MyUnit_FireOnDistanceIfSeeEnemyUnit : MyUnitAbstract
 	{
+		public delegate IMyFire FireFactory(MyPoint posSourceCenter);
+
+		// fire create
+		public FireFactory DelegateMakeFire;
+
 		// Fire preiod
 		protected long LastTimeWhenMadeFireInMilliseconds = 0;
 		protected long TimeToMakeFire = 0;
@@ -16,11 +21,6 @@ namespace MyGame_classes
 		{
 			// Damage
 			TimeToMakeFire = timeToMakeFire;
-		}
-
-		public virtual bool CanFireOnThisUnit(IMyUnit unit, IMyGraphic myGraphic, IMyLevel gameLevel)
-		{
-			return false;
 		}
 
 		public override void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel, bool bMove)
@@ -48,6 +48,36 @@ namespace MyGame_classes
 
 			// set last time for fire
 			LastTimeWhenMadeFireInMilliseconds = timeInMilliseconds;
+		}
+	
+		public virtual bool CanFireOnThisUnit(IMyUnit unit, IMyGraphic myGraphic, IMyLevel gameLevel)
+		{
+			// is team
+			if (gameLevel.IsTeam(PlayerID, unit.PlayerID))
+				return false;
+
+			// get my Level Play
+			MyLevelAbstract myLevelPlayAbstract = gameLevel as MyLevelAbstract;
+
+			// is same row
+			if (myLevelPlayAbstract.GetRow(MyPicture.GetSourceRect()) == myLevelPlayAbstract.GetRow((unit as MyUnitAbstract).MyPicture.GetSourceRect()))
+			{
+				// has enemy unit on right
+				if (myLevelPlayAbstract.GetCol(MyPicture.GetSourceRect()) <= myLevelPlayAbstract.GetCol((unit as MyUnitAbstract).MyPicture.GetSourceRect()))
+					return true;
+			}
+			return false;
+		}
+
+		public override void NeedMakeFire(IMyGraphic myGraphic, IMyLevel gameLevel)
+		{
+			MyRectangle rectSource = MyPicture.GetSourceRect();
+
+			if (DelegateMakeFire!=null)
+			{
+				IMyFire myFire = DelegateMakeFire(new MyPoint(rectSource.X + rectSource.Width / 2, rectSource.Y + rectSource.Height / 2));
+				gameLevel.Fires.Add(myFire);
+			}
 		}
 	}
 }

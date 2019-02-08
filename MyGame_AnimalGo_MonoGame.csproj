@@ -59,7 +59,7 @@
   <ItemGroup>
     <Compile Include="Activity1.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="MyGame_classes\ImageType.cs" />
+    <Compile Include="MyGame_classes\ImageType!!!!!!!!!delete.cs" />
     <Compile Include="MyGame_classes\MyAnimation.cs" />
     <Compile Include="MyGame_classes\MyBackground.cs" />
     <Compile Include="MyGame_classes\MyBackgroundImpl.cs" />
@@ -68,14 +68,14 @@
     <Compile Include="MyGame_classes\MyDialogItem.cs" />
     <Compile Include="MyGame_classes\MyDialogs.cs" />
     <Compile Include="MyGame_classes\MyFire.cs" />
-    <Compile Include="MyGame_classes\MyFire_Dog.cs" />
+    <Compile Include="MyGame_classes\MyFire_Dog!!!!!!!!!!!!!delete.cs" />
     <Compile Include="MyGame_classes\MyGame.cs" />
     <Compile Include="MyGame_classes\MyLeveAbstract.cs" />
-    <Compile Include="MyGame_classes\MyLevels.cs" />
     <Compile Include="MyGame_classes\MyPicture.cs" />
+    <Compile Include="MyGame_classes\MySettingsUnitsLevels!!!.cs" />
     <Compile Include="MyGame_classes\MyTrajectory.cs" />
     <Compile Include="MyGame_classes\MyUnitAbstract.cs" />
-    <Compile Include="MyGame_classes\MyUnits.cs" />
+    <Compile Include="MyGame_classes\MyUnits!!!!!!!!!!!!!!delete.cs" />
     <Compile Include="MyGame_classes\MyUnitWillAppear.cs" />
     <Compile Include="MyGame_classes\MyUnit_FireOnDistanceIfSeeEnemyUnit.cs" />
     <Compile Include="MyGame_classes\MyUnit_StopAndHitIfNearOtherUnit.cs" />

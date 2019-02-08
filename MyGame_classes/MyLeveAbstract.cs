@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic; // for List
+using System; // for Type
+using System.Reflection; // forConstructorInfo
 
 // my namespaces
 using MyGraphic_interfaces;
@@ -274,6 +276,29 @@ namespace MyGame_classes
 			float x = xCenter - LevelLeft;
 			float col = (x / (float)PlayZoneItemSize.Width) + 1;
 			return (int)col;
+		}
+
+		public IMyUnitWillAppear AddEnemyUnit(IMyGraphic myGraphic, double timeInSeconds, int row, Type obj)
+		{
+			// time in seconds
+			int timeInMilliseconds = (int)(timeInSeconds * 1000);
+
+			// player ID
+			int playerID = GetComputerPlayerID();
+
+			// position
+			int xPosition = GetStartXPositionWhenUnitAppear();
+			int yPosition = GetStartYPositionWhenUnitAppear(row);
+
+			// create object (reflection)
+			ConstructorInfo info = obj.GetConstructor(new Type[] { typeof(IMyGraphic), typeof(int), typeof(int), typeof(int) });
+			object myUnit = info.Invoke(new object[] { myGraphic, playerID, xPosition, yPosition });
+
+			// create IMyUnitWillAppear
+			IMyUnitWillAppear myUnitWillAppear = new MyUnitWillAppear(timeInMilliseconds, (IMyUnit)myUnit);
+			
+			// result
+			return myUnitWillAppear;
 		}
 
 		public int GetStartXPositionWhenUnitAppear()

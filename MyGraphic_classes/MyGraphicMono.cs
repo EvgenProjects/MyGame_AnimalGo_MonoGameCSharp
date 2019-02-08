@@ -39,17 +39,11 @@ namespace MyGraphic_classes
 		public MyRectangle DrawImage(object context, MyPointF pt, IMyImageFile imageFile, enImageAlign imageAlign, ref MyRectangle RectDraw)
 		{
 			// calculate source x,y
-			float xSource = pt.X;
-			float ySource = pt.Y;
-			if (imageAlign == enImageAlign.CenterX_CenterY)
-			{
-				xSource = xSource - imageFile.sizeSource.Width / 2;
-				ySource = ySource - imageFile.sizeSource.Height / 2;
-			}
+			MyPoint posLeftTopSource = ImageAlign.CalculateLeftTopPos(pt, imageAlign, imageFile.sizeSource.Width, imageFile.sizeSource.Height);
 
 			// calculate x,y,w,h Draw
-			float xDraw = xSource * XStretchCoef;
-			float yDraw = ySource * YStretchCoef;
+			float xDraw = posLeftTopSource.X * XStretchCoef;
+			float yDraw = posLeftTopSource.Y * YStretchCoef;
 			float wDraw = (float)imageFile.sizeSource.Width * XStretchCoef;
 			float hDraw = (float)imageFile.sizeSource.Height * YStretchCoef;
 
@@ -69,8 +63,8 @@ namespace MyGraphic_classes
 
 			// return Source
 			MyRectangle RectSource = new MyRectangle();
-			RectSource.X = (int)xSource;
-			RectSource.Y = (int)ySource;
+			RectSource.X = posLeftTopSource.X;
+			RectSource.Y = posLeftTopSource.Y;
 			RectSource.Width = (int)imageFile.sizeSource.Width;
 			RectSource.Height = (int)imageFile.sizeSource.Height;
 			return RectSource;
@@ -79,17 +73,11 @@ namespace MyGraphic_classes
 		public MyRectangle DrawPartImage(object context, MyPointF pt, IMyImageFile imageFile, MyRectangle part, enImageAlign imageAlign, ref MyRectangle RectDraw)
 		{
 			// calculate source x,y
-			float xSource = pt.X;
-			float ySource = pt.Y;
-			if (imageAlign == enImageAlign.CenterX_CenterY)
-			{
-				xSource = xSource - part.Width / 2;
-				ySource = ySource - part.Height / 2;
-			}
+			MyPoint posLeftTopSource = ImageAlign.CalculateLeftTopPos(pt, imageAlign, part.Width, part.Height);
 
 			// calculate x,y,w,h Draw
-			float xDraw = xSource * XStretchCoef;
-			float yDraw = ySource * YStretchCoef;
+			float xDraw = posLeftTopSource.X * XStretchCoef;
+			float yDraw = posLeftTopSource.Y * YStretchCoef;
 			float wDraw = (float)part.Width * XStretchCoef;
 			float hDraw = (float)part.Height * YStretchCoef;
 
@@ -114,8 +102,8 @@ namespace MyGraphic_classes
 
 			// return Source
 			MyRectangle RectSource = new MyRectangle();
-			RectSource.X = (int)xSource;
-			RectSource.Y = (int)ySource;
+			RectSource.X = posLeftTopSource.X;
+			RectSource.Y = posLeftTopSource.Y;
 			RectSource.Width = (int)part.Width;
 			RectSource.Height = (int)part.Height;
 			return RectSource;
@@ -160,6 +148,18 @@ namespace MyGraphic_classes
 			if (Images.TryGetValue(imageID, out image))
 				return image;
 			return null;
+		}
+
+		public MySize ConvertSourceToScreen(MySize sizeSource)
+		{
+			MySize sizeScreen = new MySize((int)((float)sizeSource.Width * XStretchCoef), (int)((float)sizeSource.Height * YStretchCoef));
+			return sizeScreen;
+		}
+
+		public MyPoint ConvertScreenToSource(MyPoint posScreen)
+		{
+			MyPoint posSource = new MyPoint((int)((float)posScreen.X / XStretchCoef), (int)((float)posScreen.Y / YStretchCoef));
+			return posSource;
 		}
 
 		// my additional attributes

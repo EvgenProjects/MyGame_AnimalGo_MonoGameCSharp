@@ -6,22 +6,26 @@ namespace MyGame_classes
 {
 	class MyDialogStartGame : MyDialogAbstract
 	{
+		protected override bool IsDrawRectangle { get { return true; } }
+		
 		// Constructor
-		public MyDialogStartGame(IMyGame myGame)
-			: base()
+		public MyDialogStartGame(IMyGame myGame) : base()
 		{
-			// show rectangle
-			ShowRectangle = false;
+			enImageType type = enImageType.Button_level_first; // picture
 
-			// add items
-			IMyImageFile myImageFile = myGame.Graphic.FindImage((int)enImageType.Button_level_first);
-			IMyDialogItem dlgItem = new MyDialogItem(new MyPicture(myImageFile, Width/2 /*x offset from dialog*/, Height/2 /*y offset from dialog*/, enImageAlign.CenterX_CenterY));
-			Items.Add(dlgItem);
+			// make dialog size same as picture
+			IMyImageFile myImageFile = myGame.Graphic.FindImage((int)type);
+			WidthSource = myImageFile.sizeSource.Width;
+			HeightSource = myImageFile.sizeSource.Height;
+
+			// add picture
+			IMyDialogItem dlgItem = AddPictureToCenterDialog(myGame.Graphic, type);
 
 			// handler click mouse
-			dlgItem.OnHandlerClickMouse = delegate(int xMouse, int yMouse, IMyGraphic myGraphic, IMyDialog myDialog)
+			dlgItem.OnHandlerClickMouse = (xMouse, yMouse, myGraphic, myDialog) =>
 			{
-				myGame.Dialog = null;
+				// close dialog
+				this.CloseDialog(myGame);
 
 				// start game
 				myGame.LoadFirstLevel();
@@ -33,24 +37,28 @@ namespace MyGame_classes
 
 	class MyDialogLevelNext : MyDialogAbstract
 	{
-		// Constructor
-		public MyDialogLevelNext(IMyGame myGame)
-			: base()
-		{
-			// show rectangle
-			ShowRectangle = false;
+		protected override bool IsDrawRectangle { get { return true; } }
 
-			// add items
-			IMyImageFile myImageFile = myGame.Graphic.FindImage((int)enImageType.Button_level_next);
-			IMyDialogItem dlgItem = new MyDialogItem(new MyPicture(myImageFile, Width / 2 /*x offset from dialog*/, Height / 2 /*y offset from dialog*/, enImageAlign.CenterX_CenterY));
-			Items.Add(dlgItem);
+		// Constructor
+		public MyDialogLevelNext(IMyGame myGame) : base()
+		{
+			enImageType type = enImageType.Button_level_next; // picture
+
+			// make dialog size same as picture
+			IMyImageFile myImageFile = myGame.Graphic.FindImage((int)type);
+			WidthSource = myImageFile.sizeSource.Width;
+			HeightSource = myImageFile.sizeSource.Height;
+
+			// add picture
+			IMyDialogItem dlgItem = AddPictureToCenterDialog(myGame.Graphic, type);
 
 			// handler click mouse
-			dlgItem.OnHandlerClickMouse = delegate(int xMouse, int yMouse, IMyGraphic myGraphic, IMyDialog myDialog)
+			dlgItem.OnHandlerClickMouse = (xMouse, yMouse, myGraphic, myDialog) =>
 			{
-				myGame.Dialog = null;
+				// close dialog
+				this.CloseDialog(myGame);
 
-				// start game
+				// next level
 				myGame.LoadNextLevel();
 
 				return true;

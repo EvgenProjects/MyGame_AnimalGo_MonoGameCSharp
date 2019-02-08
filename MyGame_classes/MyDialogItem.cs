@@ -16,11 +16,11 @@ namespace MyGame_classes
 		public HandlerClickMouse OnHandlerClickMouse { get; set; }
 
 		// offset from Dialog
-		public MyPointF PosSourceFromDialog { get; set; }
+		public MyPoint PosSourceFromLeftTopDialog { get; protected set; }
 
-		public MyDialogItem(MyPicture myPicture)
+		public MyDialogItem(MyPicture myPicture, MyPoint posSourceFromLeftTopDialog)
 		{
-			PosSourceFromDialog = myPicture.PosSource;
+			PosSourceFromLeftTopDialog = posSourceFromLeftTopDialog;
 			MyPicture = myPicture;
 			Focus = false;
 		}

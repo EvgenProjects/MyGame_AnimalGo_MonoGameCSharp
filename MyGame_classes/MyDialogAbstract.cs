@@ -9,54 +9,95 @@ namespace MyGame_classes
 	abstract class MyDialogAbstract : IMyDialog
 	{
 		// width/height
-		public virtual int Width { get { return 300; } }
-		public virtual int Height { get { return 240; } }
-
-		// objects
-		public List<IMyDialogItem> Items { get; protected set; }
+		protected virtual int WidthSource { get; set; }
+		protected virtual int HeightSource { get; set; }
 
 		// is show rectangle
-		protected bool ShowRectangle { get; set; }
+		protected virtual bool IsDrawRectangle { get { return false; } }
+		protected MyColor BorderColorForRectangle { get { return new MyColor(0, 0, 255); } }
+		protected MyColor BackgroundColorForRectangle { get { return new MyColor(0, 255, 255); } }
+		protected int LineWidthForRectangle { get { return 1; } }
+		
+		// objects
+		protected List<MyDialogItem> Items { get; private set; }
 
 		// constructor
 		public MyDialogAbstract()
 		{
-			Items = new List<IMyDialogItem>();
+			Items = new List<MyDialogItem>();
+		}
+
+		// methods
+		public IMyDialogItem AddPictureToCenterDialog(IMyGraphic myGraphic, enImageType type)
+		{
+			// center
+			MyPoint posSource = new MyPoint(WidthSource/2, HeightSource/2); 
+
+			// add picture
+			return AddPictureToDialog(myGraphic, type, posSource, enImageAlign.CenterX_CenterY);
+		}
+
+		public IMyDialogItem AddPictureToDialog(IMyGraphic myGraphic, enImageType type, MyPoint posSource, enImageAlign align)
+		{
+			// find image
+			IMyImageFile myImageFile = myGraphic.FindImage((int)type);
+
+			// MyPicture
+			MyPicture myPicture = new MyPicture(myImageFile, 0/* NOT USE (will be calculated when draw) */, 0/* NOT USE (will be calculated when draw) */, (enImageAlign)0/* NOT USE (will be calculated when draw) */);
+
+			// calcualte
+			MyPoint posSourceFromLeftTopDialog = ImageAlign.CalculateLeftTopPos(posSource, align, myPicture.ImageFile.sizeSource);
+				
+			// add dialog item
+			MyDialogItem dlgItem = new MyDialogItem(myPicture, posSourceFromLeftTopDialog);
+									
+			// add
+			Items.Add(dlgItem);
+
+			// result
+			return dlgItem;
+		}
+
+		public void CloseDialog(IMyGame myGame)
+		{
+			myGame.Dialog = null;
 		}
 
 		// events
 		public virtual void OnDraw(object context, IMyGraphic myGraphic)
 		{
-			// center dialog for scene (set Dialog x,y)
-			int xDest = myGraphic.ScreenWidth / 2 - Width / 2;
-			float xSource = xDest / myGraphic.XStretchCoef;
-			int yDest = myGraphic.ScreenHeight / 2 - Height / 2;
-			float ySource = yDest / myGraphic.YStretchCoef;
+			// calculate xDialogForDraw, yDialogForDraw
+			MySize sizeDialogForDraw = myGraphic.ConvertSourceToScreen(new MySize(WidthSource, HeightSource));
+			
+			// center dialog on game scene !!!!!
+			MyPoint posDialogForDraw = new MyPoint(myGraphic.ScreenWidth / 2 - sizeDialogForDraw.Width / 2, myGraphic.ScreenHeight / 2 - sizeDialogForDraw.Height / 2);
 
-			// is show rectangle
-			if (ShowRectangle)
+			// is draw rectangle
+			if (IsDrawRectangle)
 			{
-				// width/height
-				float widthDest = Width * myGraphic.XStretchCoef;
-				float heightDest = Height * myGraphic.YStretchCoef;
-
 				// draw rectangle
-				myGraphic.DrawRectangle(context, new MyRectangle(xDest, yDest, (int)widthDest, (int)heightDest), new MyColor(0, 0, 255), new MyColor(0, 255, 255), 1 /*line width*/);
+				myGraphic.DrawRectangle(
+					context, 
+					new MyRectangle(posDialogForDraw.X, posDialogForDraw.Y, sizeDialogForDraw.Width, sizeDialogForDraw.Height).Inflate(3), 
+					BorderColorForRectangle,
+					BackgroundColorForRectangle,
+					LineWidthForRectangle
+				);
 			}
 			
-			// enum items
-			MyDialogItem item = null;
+			// draw items
+			MyPoint posDialogSource = myGraphic.ConvertScreenToSource(posDialogForDraw);
 			for (int i = 0; i < Items.Count; i++)
 			{
-				// offset from dialog
-				item = Items[i] as MyDialogItem;
-				if (item != null)
-				{
-					item.MyPicture.PosSource.X = xSource + item.PosSourceFromDialog.X;
-					item.MyPicture.PosSource.Y = ySource + item.PosSourceFromDialog.Y;
-				}
+				if (Items[i] == null)
+					continue;
 
-				// draw item
+				// add left top pos dialog
+				Items[i].MyPicture.ImageAlign = enImageAlign.LeftTop;
+				Items[i].MyPicture.PosSource.X = Items[i].PosSourceFromLeftTopDialog.X + posDialogSource.X;
+				Items[i].MyPicture.PosSource.Y = Items[i].PosSourceFromLeftTopDialog.Y + posDialogSource.Y;
+
+				// draw
 				Items[i].OnDraw(context, myGraphic);
 			}
 		}
@@ -65,20 +106,19 @@ namespace MyGame_classes
 		{
 			// find button by mouse x,y
 			IMyDialogItem found = Items.Find(item => item.GetDrawRect().Contains(xMouse, yMouse));
-			if (found != null)
-			{
-				// unfocus all items in gameLevel.Buttons
-				for (int i = 0; i < Items.Count; i++)
-					Items[i].Focus = false;
+			if (found == null)
+				return false;
+			
+			// unfocus all items in gameLevel.Buttons
+			for (int i = 0; i < Items.Count; i++)
+				Items[i].Focus = false;
 
-				// set focus
-				found.Focus = true;
+			// set focus
+			found.Focus = true;
 
-				// result
-				if (found.OnHandlerClickMouse != null)
-					return found.OnHandlerClickMouse(xMouse, yMouse, myGraphic, this);
-			}
-
+			// result
+			if (found.OnHandlerClickMouse != null)
+				return found.OnHandlerClickMouse(xMouse, yMouse, myGraphic, this);
 			return false;
 		}
 	}

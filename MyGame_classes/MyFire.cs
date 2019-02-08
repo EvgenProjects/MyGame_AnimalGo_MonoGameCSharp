@@ -6,6 +6,10 @@ namespace MyGame_classes
 {
 	class MyFire : IMyFire
 	{
+		public readonly int TimeAnimationInMilliseconds = 300 /* 0.3 second*/;
+
+		public enImageType ImageTypeWhenDamage { get; protected set; }
+
 		public bool IsNeedDelete { get; set; }
 
 		// multiplayer
@@ -20,15 +24,14 @@ namespace MyGame_classes
 		// weapon info
 		public IMyWeaponInfo WeaponInfo { get; protected set; }
 
-		public MyFire(int damage, int playerID, MyPicture myPicture)
+		public MyFire(IMyWeaponInfo weaponInfo, IMyTrajectory myTrajectory, int playerID, MyPicture myPicture, enImageType imageTypeWhenDamage)
 		{
-			WeaponInfo = new MyWeaponInfo(damage);
+			ImageTypeWhenDamage = imageTypeWhenDamage;
+			WeaponInfo = weaponInfo;
 			IsNeedDelete = false;
 			PlayerID = playerID;
 			MyPicture = myPicture;
-
-			// trajectory
-			Trajectory = null;
+			Trajectory = myTrajectory;
 		}
 
 		// events
@@ -49,6 +52,26 @@ namespace MyGame_classes
 
 		public virtual void FireMakingDamage(IMyUnit unit, IMyGraphic myGraphic, IMyLevel gameLevel)
 		{
+			// do damage
+			unit.Life -= WeaponInfo.Damage;
+
+			// animation
+			if (ImageTypeWhenDamage != enImageType.Unknown)
+			{
+				MyRectangle rectSource = MyPicture.GetSourceRect();
+
+				gameLevel.Animations.Add(
+									new MyAnimation(
+										TimeAnimationInMilliseconds,
+										new MyPicture(
+											myGraphic.FindImage((int)ImageTypeWhenDamage),
+											rectSource.X + rectSource.Width / 2,
+											rectSource.Y + rectSource.Height / 2,
+											enImageAlign.CenterX_CenterY
+										)
+									)
+								);
+			}
 		}
 
 		public virtual void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel)
@@ -68,7 +91,7 @@ namespace MyGame_classes
 			// get Rect
 			MyRectangle rectSource = MyPicture.GetSourceRect();
 
-			// find collisionf Fire & Unit
+			// find collision Fire & Unit
 			IMyUnit unit = gameLevel.Units.Find(item =>
 			{
 				if (item.GetSourceRect().IntersectsWith(rectSource))

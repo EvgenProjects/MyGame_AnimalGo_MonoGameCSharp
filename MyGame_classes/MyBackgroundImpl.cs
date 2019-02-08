@@ -49,22 +49,7 @@ namespace MyGame_classes
 			enImageType buttonType = (enImageType)(button as MyButton).MyPicture.ImageFile.ImageID;
 
 			// create unit
-			if (buttonType == enImageType.Button_zuma)
-			{
-				gameLevel.Units.Add(new MyUnit_DogZumaGo(myGraphic, gameLevel.GetMyPlayerID(), xCenter, yCenter));
-			}
-			else if (buttonType == enImageType.Button_marshal)
-			{
-				gameLevel.Units.Add(new MyUnit_DogMarshalGo(myGraphic, gameLevel.GetMyPlayerID(), xCenter, yCenter));
-			}
-			else if (buttonType == enImageType.Button_dog)
-			{
-				gameLevel.Units.Add(new MyUnit_DogGo(myGraphic, gameLevel.GetMyPlayerID(), xCenter, yCenter));
-			}
-			else if (buttonType == enImageType.Button_krolik_s_lukom)
-			{
-				gameLevel.Units.Add(new MyUnit_KrolikStayAndFire(myGraphic, gameLevel.GetMyPlayerID(), xCenter, yCenter));
-			}
+			gameLevel.CreateMyUnitWhenClickButton(myGraphic, xCenter, yCenter, buttonType);
 
 			// unfocus button
 			button.Focus = false;

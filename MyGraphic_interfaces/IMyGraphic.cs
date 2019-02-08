@@ -13,6 +13,9 @@
 
 		void SendMessageToReDraw();
 
+		MySize ConvertSourceToScreen(MySize sizeSource);
+		MyPoint ConvertScreenToSource(MyPoint posScreen);
+
 		// Stretch
 		float XStretchCoef { get; set; }
 		float YStretchCoef { get; set; }
