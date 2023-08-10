@@ -1,3 +1,11 @@
-bin/
-obj/
+GameLogic/bin/
+GameLogic/obj/
+Android/bin/
+Android/obj/
+Android/Content/bin/
+Android/Content/obj/
+Windows/bin/
+Windows/obj/
+Windows/Content/bin/
+Windows/Content/obj/
 .vs/
