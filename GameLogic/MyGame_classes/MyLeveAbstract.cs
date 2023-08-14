@@ -108,7 +108,7 @@ namespace MyGame_classes
 					MyPicture myPicture = new MyPicture(imageFile, x, y, enImageAlign.CenterX_CenterY);
 
 					//add backgroud
-					BackgroundPictures.Add(new MyBackgroundImpl(myPicture));
+					BackgroundPictures.Add(new MyBackground(myPicture));
 				}
 
 				// add background bottom

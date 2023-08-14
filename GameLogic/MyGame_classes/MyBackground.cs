@@ -32,7 +32,50 @@ namespace MyGame_classes
 
 		public virtual bool OnClickMouse(int xMouse, int yMouse, IMyGraphic myGraphic, IMyLevel gameLevel)
 		{
-			return false;
+			// find active button
+			IMyButton button = gameLevel.Buttons.Find(item => item.Focus);
+			if (button == null)
+				return false;
+
+			// get my Level Play
+			MyLevelAbstract myLevelAbstract = gameLevel as MyLevelAbstract;
+
+			// find myHero here
+			IMyUnit myUnit = gameLevel.Units.Find(item =>
+			{
+				// is team
+				if (gameLevel.IsTeam(gameLevel.GetMyPlayerID(), item.PlayerID))
+				{
+					// is same row
+					if (myLevelAbstract.GetRow(MyPicture.GetSourceRect()) == myLevelAbstract.GetRow((item as MyUnitAbstract).MyPicture.GetSourceRect()))
+					{
+						// has enemy unit on right
+						if (myLevelAbstract.GetCol(MyPicture.GetSourceRect()) == myLevelAbstract.GetCol((item as MyUnitAbstract).MyPicture.GetSourceRect()))
+							return true;
+					}
+				}
+
+				return false;
+			});
+			if (myUnit != null)
+				return true;
+
+			// get Rect
+			MyRectangle rectSource = MyPicture.GetSourceRect();
+			int xCenter = rectSource.X + rectSource.Width / 2;
+			int yCenter = rectSource.Y + rectSource.Height / 2;
+
+			// get button type
+			enImageType buttonType = (enImageType)(button as MyButton).MyPicture.ImageFile.ImageID;
+
+			// create unit
+			gameLevel.CreateMyUnitWhenClickButton(myGraphic, xCenter, yCenter, buttonType);
+
+			// unfocus button
+			button.Focus = false;
+
+			// return
+			return true;
 		}
 	}
 }
