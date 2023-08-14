@@ -25,6 +25,11 @@
   <ItemGroup>
     <ProjectReference Include="..\GameLogic\GameLogic.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="..\GameLogic\Content\Content.mgcb">
+      <Link>ContentLink\LinkToGameLogicContent.mgcb</Link>
+    </MonoGameContentReference>
+  </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />
     <Exec Command="dotnet tool restore" />

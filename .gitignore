@@ -1,5 +1,7 @@
 GameLogic/bin/
 GameLogic/obj/
+GameLogic/Content/bin/
+GameLogic/Content/obj/
 Android/bin/
 Android/obj/
 Android/Content/bin/
@@ -8,4 +10,8 @@ Windows/bin/
 Windows/obj/
 Windows/Content/bin/
 Windows/Content/obj/
+iOS/Content/bin/
+iOS/Content/obj/
+iOS/bin/
+iOS/obj/
 .vs/

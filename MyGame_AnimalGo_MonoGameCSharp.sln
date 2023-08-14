@@ -5,9 +5,11 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Android", "Android\Android.csproj", "{813588A8-D522-4941-9DA3-D1814CFAC44A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogic", "GameLogic\GameLogic.csproj", "{071BB905-4467-4D52-B3D8-5867DF27187B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameLogic", "GameLogic\GameLogic.csproj", "{071BB905-4467-4D52-B3D8-5867DF27187B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windows", "Windows\Windows.csproj", "{E91AA747-FD59-43B6-9200-5A554C0145F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windows", "Windows\Windows.csproj", "{E91AA747-FD59-43B6-9200-5A554C0145F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iOS", "iOS\iOS.csproj", "{64648A87-1B64-4B99-A850-6CCF4DCF57F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,12 @@ Global
 		{E91AA747-FD59-43B6-9200-5A554C0145F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E91AA747-FD59-43B6-9200-5A554C0145F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E91AA747-FD59-43B6-9200-5A554C0145F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64648A87-1B64-4B99-A850-6CCF4DCF57F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64648A87-1B64-4B99-A850-6CCF4DCF57F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64648A87-1B64-4B99-A850-6CCF4DCF57F4}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{64648A87-1B64-4B99-A850-6CCF4DCF57F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64648A87-1B64-4B99-A850-6CCF4DCF57F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64648A87-1B64-4B99-A850-6CCF4DCF57F4}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
