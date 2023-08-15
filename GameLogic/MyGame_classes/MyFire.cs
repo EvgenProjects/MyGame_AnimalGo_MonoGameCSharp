@@ -12,8 +12,10 @@ namespace MyGame_classes
 
 		public bool IsNeedDelete { get; set; }
 
-		// multiplayer
-		public int PlayerID { get; protected set; }
+        public int Damage { get; protected set; }
+
+        // multiplayer
+        public int PlayerID { get; protected set; }
 
 		// image
 		protected MyPicture MyPicture;
@@ -22,12 +24,10 @@ namespace MyGame_classes
 		public IMyTrajectory Trajectory { get; protected set; }
 
 		// weapon info
-		public IMyWeaponInfo WeaponInfo { get; protected set; }
-
-		public MyFire(IMyWeaponInfo weaponInfo, IMyTrajectory myTrajectory, int playerID, MyPicture myPicture, enImageType imageTypeWhenDamage)
+		public MyFire(int damage, IMyTrajectory myTrajectory, int playerID, MyPicture myPicture, enImageType imageTypeWhenDamage)
 		{
 			ImageTypeWhenDamage = imageTypeWhenDamage;
-			WeaponInfo = weaponInfo;
+			Damage = damage;
 			IsNeedDelete = false;
 			PlayerID = playerID;
 			MyPicture = myPicture;
@@ -53,7 +53,7 @@ namespace MyGame_classes
 		public virtual void FireMakingDamage(IMyUnit unit, IMyGraphic myGraphic, IMyLevel gameLevel)
 		{
 			// do damage
-			unit.Life -= WeaponInfo.Damage;
+			unit.Life -= Damage;
 
 			// animation
 			if (ImageTypeWhenDamage != enImageType.Unknown)

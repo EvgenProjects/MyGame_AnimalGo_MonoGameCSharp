@@ -13,8 +13,8 @@ namespace MyGame_interfaces
 		// trajectory
 		IMyTrajectory Trajectory { get; }
 
-		// weapon info
-		IMyWeaponInfo WeaponInfo { get; }
+		// weapon
+		int Damage { get; }
 
 		// events
 		void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel);

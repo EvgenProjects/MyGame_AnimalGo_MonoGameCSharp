@@ -18,17 +18,20 @@ namespace MyGame_classes
 		// delete flag
 		public bool IsNeedDelete { get; set; }
 
+        public int HandDamage { get; protected set; }
+        
 		// trajectory
-		public IMyTrajectory Trajectory { get; protected set; }
+        public IMyTrajectory Trajectory { get; protected set; }
 
-		public MyUnitAbstract(int life, int playerID, MyPicture myPicture)
+		public MyUnitAbstract(int handDamage, int life, int playerID, MyPicture myPicture)
 		{
 			MyPicture = myPicture;
 			PlayerID = playerID;
 			Life = life;
+            HandDamage = handDamage;
 
-			// trajectory
-			Trajectory = null;
+            // trajectory
+            Trajectory = null;
 
 			// delete
 			IsNeedDelete = false;

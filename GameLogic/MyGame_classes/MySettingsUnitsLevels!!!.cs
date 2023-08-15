@@ -18,8 +18,6 @@ namespace MyGame_classes
 		Button_eda,
 		Button_krolik_s_lukom,
 		Button_restart,
-		Button_marshal,
-		Button_zuma,
 		Button_dog,
 		Button_level_first,
 		Button_level_next,
@@ -70,8 +68,6 @@ namespace MyGame_classes
 			Graphic.LoadImageFromFile("buttons/button_krolik_s_lukom.png", (int)enImageType.Button_krolik_s_lukom);
 			Graphic.LoadImageFromFile("buttons/button_restart.png", (int)enImageType.Button_restart);
 			Graphic.LoadImageFromFile("buttons/button_dog.png", (int)enImageType.Button_dog);
-			Graphic.LoadImageFromFile("buttons/shenachi_patrul/button_marshal.png", (int)enImageType.Button_marshal);
-			Graphic.LoadImageFromFile("buttons/shenachi_patrul/button_zuma.png", (int)enImageType.Button_zuma);
 			Graphic.LoadImageFromFile("buttons/button_level_first.png", (int)enImageType.Button_level_first);
 			Graphic.LoadImageFromFile("buttons/button_level_next.png", (int)enImageType.Button_level_next);
 
@@ -137,15 +133,7 @@ namespace MyGame_classes
 		// create my unit by button type
 		public static void CreateMyUnitWhenClickButton(this IMyLevel gameLevel, IMyGraphic myGraphic, int xCenter, int yCenter, enImageType buttonType)
 		{
-			if (buttonType == enImageType.Button_zuma)
-			{
-				gameLevel.Units.Add(new MyUnit_DogZumaGo(myGraphic, gameLevel.GetMyPlayerID(), xCenter, yCenter));
-			}
-			else if (buttonType == enImageType.Button_marshal)
-			{
-				gameLevel.Units.Add(new MyUnit_DogMarshalGo(myGraphic, gameLevel.GetMyPlayerID(), xCenter, yCenter));
-			}
-			else if (buttonType == enImageType.Button_dog)
+			if (buttonType == enImageType.Button_dog)
 			{
 				gameLevel.Units.Add(new MyUnit_DogGo(myGraphic, gameLevel.GetMyPlayerID(), xCenter, yCenter));
 			}
@@ -317,66 +305,40 @@ namespace MyGame_classes
 	class MyUnit_DogGo : MyUnit_StopAndHitIfNearOtherUnit
 	{
 		public MyUnit_DogGo(IMyGraphic myGraphic, int playerID, int xCenterSource, int yCenterSource) :
-			base(40 /*life*/, playerID /*playerID*/, 1500 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_sobachka_run/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
+			base(20/*hand damage*/, 40 /*life*/, playerID /*playerID*/, 1500 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_sobachka_run/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
 		{
 			MyPicture.ImageFile = myGraphic.FindImage((int)enImageType.Heroes_sobachka_run);
 			Trajectory = new MyTrajectory(0.7f/*x step*/, 0.0f/*y step*/);
-			WeaponInfo = new MyWeaponInfo(20/*damage*/);
-		}
-	}
-
-	class MyUnit_DogMarshalGo : MyUnit_StopAndHitIfNearOtherUnit
-	{
-		public MyUnit_DogMarshalGo(IMyGraphic myGraphic, int playerID, int xCenterSource, int yCenterSource) :
-			base(40 /*life*/, playerID /*playerID*/, 1500 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_marshal/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
-		{
-			MyPicture.ImageFile = myGraphic.FindImage((int)enImageType.Heroes_marshal);
-			Trajectory = new MyTrajectory(0.7f/*x step*/, 0.0f/*y step*/);
-			WeaponInfo = new MyWeaponInfo(20/*damage*/);
-		}
-	}
-
-	class MyUnit_DogZumaGo : MyUnit_StopAndHitIfNearOtherUnit
-	{
-		public MyUnit_DogZumaGo(IMyGraphic myGraphic, int playerID, int xCenterSource, int yCenterSource) :
-			base(40 /*life*/, playerID /*playerID*/, 1500 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_zuma/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
-		{
-			MyPicture.ImageFile = myGraphic.FindImage((int)enImageType.Heroes_zuma);
-			Trajectory = new MyTrajectory(0.7f/*x step*/, 0.0f/*y step*/);
-			WeaponInfo = new MyWeaponInfo(20/*damage*/);
 		}
 	}
 
 	class MyUnit_EnemyPauk : MyUnit_StopAndHitIfNearOtherUnit
 	{
 		public MyUnit_EnemyPauk(IMyGraphic myGraphic, int playerID, int xCenterSource, int yCenterSource) :
-			base(400 /*life*/, playerID /*playerID*/, 1500 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_spider_hit/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
+			base(10/*hand damage*/, 400 /*life*/, playerID /*playerID*/, 1500 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_spider_hit/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
 		{
 			MyPicture.ImageFile = myGraphic.FindImage((int)enImageType.Heroes_spider_go);
 			Trajectory = new MyTrajectory(-0.2f/*x step*/, 0.0f/*y step*/);
-			WeaponInfo = new MyWeaponInfo(10/*damage*/);
 		}
 	}
 
 	class MyUnit_EnemyBird1 : MyUnit_StopAndHitIfNearOtherUnit
 	{
 		public MyUnit_EnemyBird1(IMyGraphic myGraphic, int playerID, int xCenterSource, int yCenterSource) :
-			base(180 /*life*/, playerID /*playerID*/, 1000 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_bird1_fly/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
+			base(40/*hand damage*/, 180 /*life*/, playerID /*playerID*/, 1000 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_bird1_fly/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
 		{
 			MyPicture.ImageFile = myGraphic.FindImage((int)enImageType.Heroes_bird1_fly);
 			Trajectory = new MyTrajectory(-1.8f/*x step*/, 0.0f/*y step*/);
-			WeaponInfo = new MyWeaponInfo(40/*damage*/);
 		}
 	}
 
 	class MyUnit_EnemyZmeia : MyUnit_StopAndHitIfNearOtherUnit
 	{
 		public MyUnit_EnemyZmeia(IMyGraphic myGraphic, int playerID, int xCenterSource, int yCenterSource) :
-			base(40 /*life*/, playerID /*playerID*/, 1500 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_zmeia_zalit/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
+			base(20/*hand damage*/, 40 /*life*/, playerID /*playerID*/, 1500 /*1.5 second (time to make damage near)*/, (int)enImageType.Heroes_zmeia_zalit/*image Type when Damage*/, new MyPicture(null, xCenterSource, yCenterSource, enImageAlign.CenterX_CenterY))
 		{
 			MyPicture.ImageFile = myGraphic.FindImage((int)enImageType.Heroes_zmeia_go);
 			Trajectory = new MyTrajectory(-0.7f/*x step*/, 0.0f/*y step*/);
-			WeaponInfo = new MyWeaponInfo(20/*damage*/);
 		}
 	}
 
@@ -392,13 +354,12 @@ namespace MyGame_classes
 			DelegateMakeFire = (posSourceCenter) =>
 			{
 				IMyTrajectory trajectory = new MyTrajectory(4.7f/*x step*/, 0.0f/*y step*/);
-				IMyWeaponInfo weaponInfo = new MyWeaponInfo(10/*damage*/);
 				enImageType imageTypeWhenDamage = enImageType.Fire_morkovka_splash;
 				IMyImageFile myImageFile = myGraphic.FindImage((int)enImageType.Fire_morkovka);
 
 				MyPicture myPicture = new MyPicture(myImageFile, posSourceCenter.X, posSourceCenter.Y, enImageAlign.CenterX_CenterY);
 
-				MyFire myFire = new MyFire(weaponInfo, trajectory, playerID, myPicture, imageTypeWhenDamage);
+				MyFire myFire = new MyFire(10/*hand damage*/, trajectory, playerID, myPicture, imageTypeWhenDamage);
 				return myFire;
 			};
 		}

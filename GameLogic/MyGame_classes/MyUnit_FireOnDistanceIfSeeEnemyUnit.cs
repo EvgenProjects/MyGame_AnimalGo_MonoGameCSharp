@@ -17,7 +17,7 @@ namespace MyGame_classes
 
 		// constructor
 		public MyUnit_FireOnDistanceIfSeeEnemyUnit(int life, int playerID, long timeToMakeFire, MyPicture myPicture)
-			: base(life, playerID, myPicture)
+			: base(0 /*hand damage*/,life, playerID, myPicture)
 		{
 			// Damage
 			TimeToMakeFire = timeToMakeFire;

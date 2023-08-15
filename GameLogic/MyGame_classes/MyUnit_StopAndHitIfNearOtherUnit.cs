@@ -7,9 +7,6 @@ namespace MyGame_classes
 {
 	class MyUnit_StopAndHitIfNearOtherUnit : MyUnitAbstract
 	{
-		// weapon info
-		public IMyWeaponInfo WeaponInfo { get; protected set; }
-
 		// time to hit
 		protected long LastTimeWhenMakeDamageInMilliseconds = 0;
 		protected long TimeToMakeDamageNear = 0;
@@ -21,8 +18,8 @@ namespace MyGame_classes
 		public IMyUnit CollisionWithUnit { get; protected set; }
 
 		// constructor
-		public MyUnit_StopAndHitIfNearOtherUnit(int life, int playerID, long timeToMakeDamageNear, int imageTypeWhenDamage, MyPicture myPicture) :
-			base(life, playerID, myPicture)
+		public MyUnit_StopAndHitIfNearOtherUnit(int handDamage, int life, int playerID, long timeToMakeDamageNear, int imageTypeWhenDamage, MyPicture myPicture) :
+			base(handDamage, life, playerID, myPicture)
 		{
 			CollisionWithUnit = null;
 
@@ -98,7 +95,7 @@ namespace MyGame_classes
 			base.NeedMakeDamageToUnit(unit, myGraphic, gameLevel);
 
 			// do damage
-			unit.Life -= WeaponInfo.Damage;
+			unit.Life -= HandDamage;
 
 			// animation
 			if (ImageTypeWhenDamage != 0)
