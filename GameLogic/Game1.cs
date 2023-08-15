@@ -1,21 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MyGame_classes;
-using MyGame_interfaces;
-using MyGraphic_classes;
-using System;
+using MyGame;
+using MyGame.interfaces;
 
 namespace GameLogic
 {
     /// This is the main type for your game.  
     public class Game1 : Game
     {
-        GraphicsDeviceManager graphics;
+        public GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        MyGraphicMono myGraphic;
-        IMyGame myGame;
+        IMyGraphic myGraphic;
+        public MyGame.MyGame myGame;
         long PrevTime = 0;
 
         public Game1()
@@ -23,7 +21,8 @@ namespace GameLogic
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "ContentLink";
 
-           // graphics.IsFullScreen = true;
+            // graphics.IsFullScreen = true;
+            //graphics.HardwareModeSwitch = false;
             graphics.PreferredBackBufferWidth = 800;
             graphics.PreferredBackBufferHeight = 480;
             graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
@@ -44,9 +43,8 @@ namespace GameLogic
             // Create a new SpriteBatch, which can be used to draw textures.  
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // моя инициализация !!!
-            myGraphic = new MyGraphicMono(Content, spriteBatch, GraphicsDevice);
-            myGame = new MyGame(myGraphic);
+            myGraphic = new MyGraphic(Content, spriteBatch, GraphicsDevice);
+            myGame = new MyGame.MyGame(myGraphic);
 
             // load game data
             myGame.OnInit();
@@ -103,25 +101,18 @@ namespace GameLogic
         /// This is called when the game should draw itself.  
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(MyGraphicMono.GetDefaultBgColor());
+            GraphicsDevice.Clear(MyGraphic.GetDefaultBgColor());
 
             // resize if changed width or height
-            int screenWidth = (int)GraphicsDevice.DisplayMode.Width;
-            int screenHeight = (int)GraphicsDevice.DisplayMode.Height;
-            if (myGame.Graphic.ScreenWidth != (int)screenWidth || myGame.Graphic.ScreenHeight != screenHeight)
+            int screenWidth = graphics.GraphicsDevice.Viewport.Width;
+            int screenHeight = graphics.GraphicsDevice.Viewport.Height;
+            if (myGame.MyGraphic.ScreenWidth != (int)screenWidth || myGame.MyGraphic.ScreenHeight != screenHeight)
             {
-                // fix when rotating phone
-                graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.Viewport.Height;
-                graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.Viewport.Width;
-                graphics.ApplyChanges();
-
-                // on change size
                 myGame.OnChangeWindowSize(screenWidth, screenHeight);
             }
 
-            // мое рисование !!!
             spriteBatch.Begin();
-            myGame.OnDraw(null);
+            myGame.OnDraw();
             spriteBatch.End();
 
             base.Draw(gameTime);
