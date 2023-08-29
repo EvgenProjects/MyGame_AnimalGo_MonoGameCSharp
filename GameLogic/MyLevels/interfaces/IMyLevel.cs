@@ -1,44 +1,51 @@
 ﻿using MyGame;
 using MyGame.interfaces;
 using MyUnits.interfaces;
+using System;
 using System.Collections.Generic; // for List
 
 namespace MyLevels.interfaces
 {
-	public interface IMyLevel
+    public struct LevelInfo
+    {
+        public int ColsCount;
+        public int RowsCount;
+        public enImageType[] Buttons;
+        public Func<int, int, enImageType> FuncBackgroundImageType;
+        public IUnitWillAppear[] UnitsWillAppear;
+        public LevelInfo(int colsCount, int rowsCount, enImageType[] buttons, Func<int, int, enImageType> funcBackgroundImageType, IUnitWillAppear[] unitsWillAppear)
+        {
+            ColsCount = colsCount;
+            RowsCount = rowsCount;
+            Buttons = buttons;
+            FuncBackgroundImageType = funcBackgroundImageType;
+            UnitsWillAppear = unitsWillAppear;
+        }
+    }
+    
+    public interface IMyLevel
 	{
-		// width/height
-		int LevelWidth { get; }
-		int LevelHeight { get; }
-		int LevelLeft { get; }
-		int LevelTop { get; }
-
-        // objects
-        MyTexture2DAnimation? ActiveButtonInActionZone { get; set; }
-        List<IUnit> Units { get; }
-		List<IBackgroundSquad> BackgroundPictures { get; }
-		List<IUnitWillAppear> UnitsWillAppear { get; }
-		List<IFire> Fires { get; }
-		List<IAnimPictureDieByTime> AnimPicturesDieByTime { get; }
-        List<MyTexture2DAnimation?> ButtonsInActionZone { get; }
-
-        // events
-        void OnLoad(IMyGraphic myGraphic);
-		void OnDraw(IMyGraphic myGraphic);
-		void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic);
-		bool OnClickMouse(int xMouse, int yMouse, IMyGraphic myGraphic);
-		void OnCreateUnit_WhenDeleteUnitWillAppear(IMyGraphic myGraphic, IUnitWillAppear gameUnitWillAppear);
+        LevelInfo LevelInfo { get; }
+        int LevelWidth { get; }
+        int LevelHeight { get; }
+        int LevelLeft { get; }
+        int LevelTop { get; }
 
         int GetRow(MyRectangle rect);
         int GetCol(MyRectangle rect);
+        
+        int GetXCenterItemByColNumber(int col);
+        int GetYCenterItemByRowNumber(int row);
 
-        // level end
-        bool IsLevelEnd();
+        MyTexture2DAnimation? ActiveButtonInActionZone { get; set; }
+        List<IUnit> MyUnits { get; }
+        List<IUnit> EnemyUnits { get; }
+        List<IFire> MyFires { get; }
+        List<IFire> EnemyFires { get; }
 
-		// multiplayer
-		int[] GetPlayerIDs();
-		string GetPlayerName(int playerID);
-		bool IsTeam(int playerID1, int playerID2);
-		int GetMyPlayerID();
+        List<IBackgroundSquad> BackgroundPictures { get; }
+		List<IUnitWillAppear> UnitsWillAppear { get; }
+        List<IAnimPictureDieByTime> AnimPicturesDieByTime { get; }
+        List<MyTexture2DAnimation?> ButtonsInActionZone { get; }
 	}
 }

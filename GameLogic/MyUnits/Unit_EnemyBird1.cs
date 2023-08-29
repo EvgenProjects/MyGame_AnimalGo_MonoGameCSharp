@@ -6,10 +6,10 @@ namespace MyUnits
 {
 	class Unit_EnemyBird1 : Unit_Template_StopAndHitIfNearOtherUnit
 	{
-		public Unit_EnemyBird1(IMyGraphic myGraphic, int xCenterSource, int yCenterSource, int playerID) :
+		public Unit_EnemyBird1(IMyGraphic myGraphic, int xCenterSource, int yCenterSource) :
 			base(myGraphic,
                 xCenterSource, yCenterSource,
-                playerID /*playerID*/,
+                false /*is my unit*/,
                 180 /*life*/,
                 40/*hand damage*/,
                 1000 /*1.5 second (time to make damage near)*/,

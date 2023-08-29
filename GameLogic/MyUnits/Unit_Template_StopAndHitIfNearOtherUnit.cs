@@ -8,11 +8,11 @@ namespace MyUnits
 	class Unit_Template_StopAndHitIfNearOtherUnit : IUnit
 	{
         public MyTexture2DAnimation MyTexture2DAnimation;
-        public virtual int PlayerID { get; protected set; }
         public int Life { get; set; }
         public bool IsNeedDelete { get; set; }
         public int HandDamage { get; protected set; }
         public ITrajectory Trajectory { get; protected set; }
+		public bool IsMyUnit { get; }
 
         protected long LastTimeWhenMakeDamageInMilliseconds = 0;
 		protected long TimeToMakeDamageNear = 0;
@@ -21,16 +21,16 @@ namespace MyUnits
 		public IUnit CollisionWithUnit { get; protected set; }
 
         // constructor
-        public Unit_Template_StopAndHitIfNearOtherUnit(IMyGraphic myGraphic, int xCenter, int yCenter, int playerID, int life, int handDamage, long timeToMakeDamageNear, enImageType imageTypeWhenMove, enImageType imageTypeWhenDamage)
+        public Unit_Template_StopAndHitIfNearOtherUnit(IMyGraphic myGraphic, int xCenter, int yCenter, bool isMyUnit, int life, int handDamage, long timeToMakeDamageNear, enImageType imageTypeWhenMove, enImageType imageTypeWhenDamage)
         {
             CollisionWithUnit = null;
-            PlayerID = playerID;
             Life = life;
             HandDamage = handDamage;
             Trajectory = null;
             IsNeedDelete = false;
             TimeToMakeDamageNear = timeToMakeDamageNear;
             ImageTypeWhenDamage = imageTypeWhenDamage;
+			IsMyUnit = isMyUnit;
 
             IMyTexture2D myTexture2D = myGraphic.FindImage(imageTypeWhenMove);
             MyTexture2DAnimation = new MyTexture2DAnimation(myTexture2D, xCenter, yCenter);
@@ -48,8 +48,10 @@ namespace MyUnits
 
 		public virtual void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic, IMyLevel gameLevel, bool bMove)
 		{
-			// find collision by Enemy
-			IUnit findCollisionWithUnit = gameLevel.Units.Find(unit =>
+			var unitsForFight = IsMyUnit ? gameLevel.EnemyUnits : gameLevel.MyUnits;
+
+            // find collision with Enemy
+            IUnit findCollisionWithUnit = unitsForFight.Find(unit =>
 			{
                 Unit_Template_StopAndHitIfNearOtherUnit unitTemp = (unit as Unit_Template_StopAndHitIfNearOtherUnit);
 				if (unitTemp != null)
@@ -66,15 +68,11 @@ namespace MyUnits
 				MyRectangle rect = MyTexture2DAnimation.GetRectInScenaPoints(myGraphic);
 
 				// find collision with my Unit
-				findCollisionWithUnit = gameLevel.Units.Find(item =>
+				findCollisionWithUnit = unitsForFight.Find(item =>
 				{
-					// not team
-					if (!gameLevel.IsTeam(PlayerID, item.PlayerID))
-					{
-						//is intersect
-						if (item.GetRectInScenaPoints(myGraphic).IntersectsWith(rect))
-							return true;
-					}
+					//is intersect
+					if (item.GetRectInScenaPoints(myGraphic).IntersectsWith(rect))
+						return true;
 					return false;
 				});
 			}

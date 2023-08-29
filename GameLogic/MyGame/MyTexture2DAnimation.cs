@@ -22,7 +22,11 @@ namespace MyGame
             MyTexture2D = myTexture2D;
 		}
 
-		public void ChangeSpriteIndex(long timeInMilliseconds)
+        public void Unload()
+		{
+        }
+
+        public void ChangeSpriteIndex(long timeInMilliseconds)
 		{
 			if ((timeInMilliseconds - LastTimeInMillisecondsWhenSpriteIndexChanged) > 100) // 1/10 second
 			{

@@ -1,131 +1,113 @@
-﻿using MyDialogs;
-using MyGame.interfaces;
-using MyLevels.interfaces;
+﻿using MyGame.interfaces;
+using MyLevels;
 
 namespace MyGame
 {
+    enum enLevelType
+    {
+        Intro = 0,
+        LevelStart = 1,
+        LevelEnd = 1000,
+    };
+    
 	public class MyGame
 	{
-		// graphic
-		public IMyGraphic MyGraphic { get; protected set; }
+        public readonly int TimeStepInMilliseconds = 20;
+		private readonly IMyGraphic _myGraphic;
+        private enLevelType _levelType;
+        private MyLevelIntro _myLevelIntro;
+        private MyLevel _myLevel;
 
-		// levels
-		private readonly IMyLevel[] _gameLevels;
-		public IMyLevel[] Levels { get { return _gameLevels; } }
-		public int CurrentLevelIndex { get; protected set; }
-
-		// time
-		public virtual int GetTimeStepInMilliseconds() { return 20; } // 20 miliseconds
-
-		// constructor
-		public MyGame(IMyGraphic myGraphic)
+        // constructor
+        public MyGame(IMyGraphic myGraphic)
 		{
-            MyGraphic = myGraphic;
-		
-			// set levels
-			_gameLevels = this.GetLevels();
+            _myGraphic = myGraphic;
+			_myLevel = new MyLevel();
+            _myLevelIntro = new MyLevelIntro();
 		}
 
-		// methods
+        public virtual void OnInit()
+        {
+            MySettings.LoadImages(_myGraphic);
+            LoadLevelIntro();
+        }
+        
 		public virtual void OnExit()
 		{
 		}
 
-		public virtual void OnInit()
+        void LoadLevelIntro()
+        {
+            _levelType = enLevelType.Intro;
+            _myLevelIntro.OnLoad(_myGraphic);
+        }
+        
+        public virtual void LoadFirstLevel()
 		{
-			this.LoadImages(MyGraphic);
+            _levelType = enLevelType.LevelStart;
+            _myLevel.OnLoad(_myGraphic, (int)_levelType);
+        }
 
-			// open dialog
-			//new MyDialogStartGame()).ClickStart(MyGraphic, this);
-			LoadFirstLevel();
+        public virtual void LoadNextLevel()
+		{
+            _levelType++;
+            _myLevel.OnLoad(_myGraphic, (int)_levelType);
+        }
+
+        public virtual void OnChangeWindowSize(int screenWidth, int screenHeight)
+		{
+            _myGraphic.ScreenWidth = screenWidth;
+            _myGraphic.ScreenHeight = screenHeight;
+
+            int levelWidth = 1;
+            int levelHeight = 1;
+            if (_levelType == enLevelType.Intro)
+            {
+                levelWidth = _myLevelIntro.LevelWidth;
+                levelHeight = _myLevelIntro.LevelHeight;
+            }
+            else if (_levelType >= enLevelType.LevelStart && _levelType <= enLevelType.LevelEnd)
+            {
+                levelWidth = _myLevel.LevelWidth;
+                levelHeight = _myLevel.LevelHeight;
+            }
+
+            // calculate
+            _myGraphic.XStretchCoef = (float)_myGraphic.ScreenWidth / levelWidth;
+            _myGraphic.YStretchCoef = (float)_myGraphic.ScreenHeight / levelHeight;
 		}
 
-		public virtual void LoadFirstLevel()
+        public virtual void OnNextTurn(long timeInMilliseconds)
+        {
+            if (_levelType == enLevelType.Intro)
+                _myLevelIntro.OnNextTurn(timeInMilliseconds, _myGraphic);
+            else if (_levelType >= enLevelType.LevelStart && _levelType <= enLevelType.LevelEnd)
+                _myLevel.OnNextTurn(timeInMilliseconds, _myGraphic);
+        }
+        
+        public virtual void OnDraw()
 		{
-			CurrentLevelIndex = 0;
+            if (_levelType == enLevelType.Intro)
+                _myLevelIntro.OnDraw(_myGraphic);
+            else if (_levelType >= enLevelType.LevelStart && _levelType <= enLevelType.LevelEnd)
+                _myLevel.OnDraw(_myGraphic);
+        }
 
-			// get cur level
-			IMyLevel myLevel = GetCurLevel();
+        public virtual void OnTouch(int xTouch, int yTouch)
+        {
+            MyPointF ptMouseInScenaPoints = _myGraphic.ConvertMousePtToScenaPoints(xTouch, yTouch);
 
-			// load
-			if (myLevel != null)
-				myLevel.OnLoad(MyGraphic);
-		}
+            if (_levelType == enLevelType.Intro)
+            {
+                if (_myLevelIntro.OnTouch(_myGraphic, (int)ptMouseInScenaPoints.X, (int)ptMouseInScenaPoints.Y) == enLevelIntroTouch.LoadFirstLevel)
+                    LoadFirstLevel();
+            }
 
-		public virtual void LoadNextLevel()
-		{
-			CurrentLevelIndex++;
-
-			// get cur level
-			IMyLevel myLevel = GetCurLevel();
-
-			// load
-			if (myLevel!=null)
-				myLevel.OnLoad(MyGraphic);
-		}
-
-		public virtual IMyLevel GetCurLevel()
-		{
-			// check
-			if (Levels == null || CurrentLevelIndex < 0 || CurrentLevelIndex >= Levels.Length)
-				return null;
-
-			// result
-			return Levels[CurrentLevelIndex];
-		}
-
-		public virtual void OnNextTurn(long timeInMilliseconds)
-		{
-			// get cur level
-			IMyLevel myLevel = GetCurLevel();
-
-			if (myLevel != null)
-			{
-				// next turn
-				myLevel.OnNextTurn(timeInMilliseconds, MyGraphic);
-
-				// is level end
-				if (myLevel.IsLevelEnd())
-				{
-					// open dialog
-					//OpenDialog(new MyDialogLevelNext(MyGraphic));
-				}
-			}
-		}
-
-		public virtual void OnChangeWindowSize(int screenWidth, int screenHeight)
-		{
-            MyGraphic.ScreenWidth = screenWidth;
-            MyGraphic.ScreenHeight = screenHeight;
-
-            // calculate stratch
-            MyGraphic.XStretchCoef = (float)MyGraphic.ScreenWidth / Levels[CurrentLevelIndex].LevelWidth;
-            MyGraphic.YStretchCoef = (float)MyGraphic.ScreenHeight / Levels[CurrentLevelIndex].LevelHeight;
-		}
-
-		public virtual void OnDraw()
-		{
-			// get cur level
-			IMyLevel myLevel = GetCurLevel();
-
-			// draw
-			if (myLevel != null)
-				myLevel.OnDraw(MyGraphic);
-		}
-
-		public virtual bool OnClickMouse(int xMouse, int yMouse)
-		{
-			// get cur level
-			IMyLevel myLevel = GetCurLevel();
-
-            MyPointF ptMouseInScenaPoints = MyGraphic.ConvertMousePtToScenaPoints(xMouse, yMouse);
-
-            // click mouse
-            if (myLevel != null && myLevel.OnClickMouse((int)ptMouseInScenaPoints.X, (int)ptMouseInScenaPoints.Y, MyGraphic))
-			{
-				return true;
-			}
-			return false;
+            else if (_levelType >= enLevelType.LevelStart && _levelType <= enLevelType.LevelEnd)
+            {
+                if (_myLevel.OnTouch(_myGraphic, (int)ptMouseInScenaPoints.X, (int)ptMouseInScenaPoints.Y) == enLevelTouch.LoadNextLevel)
+                    LoadNextLevel();
+            }
 		}
 	}
 }

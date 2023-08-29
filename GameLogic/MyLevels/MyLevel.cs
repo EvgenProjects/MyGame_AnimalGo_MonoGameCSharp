@@ -8,79 +8,74 @@ using MyGame;
 
 namespace MyLevels
 {
-	abstract class MyLevel : IMyLevel
+    enum enLevelTouch
+    {
+        Handled = 0,
+        LoadNextLevel = 1
+    }
+    
+	class MyLevel : IMyLevel
 	{
 		// width/height
-		public virtual int LevelWidth { get { return 680; } }
-		public virtual int LevelHeight { get { return 380; } }
-		public virtual int LevelLeft { get { return 16; } }
-		public virtual int LevelTop { get { return 18; } }
-
-		protected MySize PlayZoneItemSize = new MySize(64, 80); ///// !!!!!
+		public virtual int LevelWidth => 680;
+		public virtual int LevelHeight => 380;
+		public virtual int LevelLeft => 16;
+		public virtual int LevelTop => 18;
+        public readonly MySize PlayZoneItemSize = new MySize(64, 80);
 
 		// time statistic
 		protected int HowMuchTimeInMilliseconds_TakeNextTurn = 0;
 		protected int HowMuchTimeInMilliseconds_TakeDraw = 0;
 
+        // dialogs
+        public MyTexture2DAnimation? ButtonNextLevel { get; protected set; }
+
+        // level info
+        public virtual LevelInfo LevelInfo { get; protected set; }
+
         // objects
+        public List<IUnit> MyUnits { get; protected set; }
+        public List<IUnit> EnemyUnits { get; protected set; }
+        public List<IFire> MyFires { get; protected set; }
+        public List<IFire> EnemyFires { get; protected set; }
         public MyTexture2DAnimation? ActiveButtonInActionZone { get; set; }
-        public List<IUnit> Units { get; protected set; }
 		public List<IBackgroundSquad> BackgroundPictures { get; protected set; }
         public List<IUnitWillAppear> UnitsWillAppear { get; protected set; }
-		public List<IFire> Fires { get; protected set; }
 		public List<IAnimPictureDieByTime> AnimPicturesDieByTime { get; protected set; }
         public List<MyTexture2DAnimation?> ButtonsInActionZone { get; protected set; }
 
         // constructor
         public MyLevel()
 		{
-			Units = new List<IUnit>();
-			BackgroundPictures = new List<IBackgroundSquad>();
+			MyUnits = new List<IUnit>();
+            EnemyUnits = new List<IUnit>();
+            MyFires = new List<IFire>();
+            EnemyFires = new List<IFire>();
+            BackgroundPictures = new List<IBackgroundSquad>();
 	        ButtonsInActionZone = new List<MyTexture2DAnimation?>();
             UnitsWillAppear = new List<IUnitWillAppear>();
-			Fires = new List<IFire>();
             AnimPicturesDieByTime = new List<IAnimPictureDieByTime>();
-		}
-
-		// abstract
-		public abstract int GetCols();
-		public abstract int GetRows();
-		public abstract IUnitWillAppear[] GetUnitsWillAppear(IMyGraphic myGraphic);
-		public abstract enImageType GetBackgroundImageType(int row, int col);
-		public abstract enImageType[] GetButtons();
-
-		// multiplayer
-		public virtual int[] GetPlayerIDs()
-		{
-			return null;
-		}
-
-		public virtual string GetPlayerName(int playerID)
-		{
-			return "";
-		}
-
-		public virtual int GetMyPlayerID()
-		{
-			return 0;
-		}
-
-		public int GetComputerPlayerID()
-		{
-			return 1000; // any number
-		}
-
-		public virtual bool IsTeam(int playerID1, int playerID2)
-		{
-			if (playerID1 != playerID2 && (playerID1 == GetComputerPlayerID() || playerID2 == GetComputerPlayerID()))
-				return false;
-			return true;
+            ButtonNextLevel = null; // create when all enemy units destroied
 		}
 
 		// load
-		public virtual void OnLoad(IMyGraphic myGraphic)
+		public virtual void OnLoad(IMyGraphic myGraphic, int levelNumber)
 		{
-			LoadBackground(myGraphic);
+            LevelInfo = GetLevelInfo(levelNumber);
+
+            ButtonNextLevel?.Unload();
+            ButtonNextLevel = null;
+            
+			MyUnits.Clear();
+            EnemyUnits.Clear();
+            MyFires.Clear();
+            EnemyFires.Clear();
+            BackgroundPictures.Clear();
+            ButtonsInActionZone.Clear();
+            UnitsWillAppear.Clear();
+            AnimPicturesDieByTime.Clear();
+
+            LoadBackground(myGraphic);
 			LoadButtons(myGraphic);
 			LoadUnitsWillAppear(myGraphic);
 		}
@@ -90,13 +85,13 @@ namespace MyLevels
 			enImageType imageType;
 			IMyTexture2D myTexture2D;
 
-			// add level background
-			for (int col = 1; col <= GetCols(); col++)
+            // add level background
+            for (int col = 1; col <= LevelInfo.ColsCount; col++)
 			{
-				for (int row = 1; row <= GetRows(); row++)
+				for (int row = 1; row <= LevelInfo.RowsCount; row++)
 				{
 					// image type
-					imageType = GetBackgroundImageType(row, col);
+					imageType = LevelInfo.FuncBackgroundImageType(row, col);
 
 					// x,y
 					int x = GetXCenterItemByColNumber(col);
@@ -116,7 +111,7 @@ namespace MyLevels
 				imageType = enImageType.Background_Bottom;
                 myTexture2D = myGraphic.FindImage(imageType);
 				int xLeftBackground = LevelLeft + myTexture2D.sizeSource.Width * (col - 1);
-				int yBottomBackground = GetYCenterItemByRowNumber(GetRows()) + PlayZoneItemSize.Height / 2 + myTexture2D.sizeSource.Height;
+				int yBottomBackground = GetYCenterItemByRowNumber(LevelInfo.RowsCount) + PlayZoneItemSize.Height / 2 + myTexture2D.sizeSource.Height;
 				BackgroundPictures.Add(new BackgroundSquad_Template(new MyTexture2DAnimation(myTexture2D, xLeftBackground + myTexture2D.sizeSource.Width / 2, yBottomBackground - myTexture2D.sizeSource.Height/2)));
 			}
 		}
@@ -124,11 +119,11 @@ namespace MyLevels
 		public void LoadButtons(IMyGraphic myGraphic)
 		{
 			// get buttons
-			enImageType[] buttonsID = GetButtons();
+			enImageType[] buttonsID = LevelInfo.Buttons;
 
 			// get x,y for buttons
 			int xCenter = GetXCenterItemByColNumber(1);
-            int yCenter = GetYCenterItemByRowNumber(GetRows() + 1);
+            int yCenter = GetYCenterItemByRowNumber(LevelInfo.RowsCount + 1) + GetYCenterItemByRowNumber(1)/2;
 
 			// enum buttons
 			foreach (enImageType buttonID in buttonsID)
@@ -147,7 +142,7 @@ namespace MyLevels
 			UnitsWillAppear.Clear();
 
 			// add
-			UnitsWillAppear.AddRange(GetUnitsWillAppear(myGraphic));
+			UnitsWillAppear.AddRange(LevelInfo.UnitsWillAppear);
 		}
 
 		public virtual void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic)
@@ -159,28 +154,60 @@ namespace MyLevels
 			if (timeInMilliseconds == 0)
 				return;
 
-			// Units
-			for (int i = (Units.Count - 1); i >= 0; i--)
+			// is level end
+			if (UnitsWillAppear.Count == 0 && EnemyUnits.Count == 0)
+			{
+				if (ButtonNextLevel==null)
+				{
+					int xCenter = LevelWidth / 2;
+					int yCenter = LevelHeight / 2;
+                    ButtonNextLevel = new MyTexture2DAnimation(myGraphic.FindImage(enImageType.Button_level_next), xCenter, yCenter);
+				}
+				return;
+            }
+
+            // my Units
+            for (int i = (MyUnits.Count - 1); i >= 0; i--)
 			{
 				// delete
-				if (Units[i].IsNeedDelete)
-					Units.RemoveAt(i);
+				if (MyUnits[i].IsNeedDelete)
+                    MyUnits.RemoveAt(i);
 				else
-					Units[i].OnNextTurn(timeInMilliseconds, myGraphic, this, true/*move*/);
+                    MyUnits[i].OnNextTurn(timeInMilliseconds, myGraphic, this, true/*move*/);
 			}
 
-			// Fires
-			for (int i = (Fires.Count - 1); i >= 0; i--)
+            // enemy Units
+            for (int i = (EnemyUnits.Count - 1); i >= 0; i--)
+            {
+                // delete
+                if (EnemyUnits[i].IsNeedDelete)
+                    EnemyUnits.RemoveAt(i);
+                else
+                    EnemyUnits[i].OnNextTurn(timeInMilliseconds, myGraphic, this, true/*move*/);
+            }
+            
+			// my Fires
+            for (int i = (MyFires.Count - 1); i >= 0; i--)
 			{
 				// delete
-				if (Fires[i].IsNeedDelete)
-					Fires.RemoveAt(i);
+				if (MyFires[i].IsNeedDelete)
+                    MyFires.RemoveAt(i);
 				else
-					Fires[i].OnNextTurn(timeInMilliseconds, myGraphic, this);
+                    MyFires[i].OnNextTurn(timeInMilliseconds, myGraphic, this);
 			}
 
+            // enemy Fires
+            for (int i = (EnemyFires.Count - 1); i >= 0; i--)
+            {
+                // delete
+                if (EnemyFires[i].IsNeedDelete)
+                    EnemyFires.RemoveAt(i);
+                else
+                    EnemyFires[i].OnNextTurn(timeInMilliseconds, myGraphic, this);
+            }
+            
 			// Animations
-			for (int i = (AnimPicturesDieByTime.Count - 1); i >= 0; i--)
+            for (int i = (AnimPicturesDieByTime.Count - 1); i >= 0; i--)
 			{
 				// delete
 				if (AnimPicturesDieByTime[i].IsNeedDelete)
@@ -217,60 +244,76 @@ namespace MyLevels
             if (ActiveButtonInActionZone != null)
                 myGraphic.DrawRectangle(ActiveButtonInActionZone.Value.GetRectInScenaPoints(myGraphic).Inflate(3), new MyColor(0, 0, 255), new MyColor(0, 255, 255), 3 /*line width*/);
             
-			// Units
-            for (int i = 0; i < Units.Count; i++)
-				Units[i].OnDraw(myGraphic);
+			// my Units
+            for (int i = 0; i < MyUnits.Count; i++)
+                MyUnits[i].OnDraw(myGraphic);
 
-			// Fires
-			for (int i = 0; i < Fires.Count; i++)
-				Fires[i].OnDraw(myGraphic);
+            // enemy Units
+            for (int i = 0; i < EnemyUnits.Count; i++)
+                EnemyUnits[i].OnDraw(myGraphic);
+            
+			// my Fires
+            for (int i = 0; i < MyFires.Count; i++)
+                MyFires[i].OnDraw(myGraphic);
 
+            // enemy Fires
+            for (int i = 0; i < EnemyFires.Count; i++)
+                EnemyFires[i].OnDraw(myGraphic);
+            
 			// Animations
-			for (int i = 0; i < AnimPicturesDieByTime.Count; i++)
+            for (int i = 0; i < AnimPicturesDieByTime.Count; i++)
                 AnimPicturesDieByTime[i].OnDraw(myGraphic);
 
-			// Buttons
+			// Buttons in Action zone
 			for (int i = 0; i < ButtonsInActionZone.Count; i++)
                 ButtonsInActionZone[i]?.OnDraw(myGraphic);
 
-            // statistic
-            string info = string.Format("NextTurn time={0} , Units count={1}", HowMuchTimeInMilliseconds_TakeNextTurn, Units.Count);
-			myGraphic.DrawText(10, 0, info, 16/*text size*/, new MyColor(128, 128, 128));
-		}
+            // Buttons
+            ButtonNextLevel?.OnDraw(myGraphic);
 
-		public virtual bool OnClickMouse(int xMouse, int yMouse, IMyGraphic myGraphic)
+            // statistic
+            //string info = string.Format("NextTurn time={0} , Units count={1}", HowMuchTimeInMilliseconds_TakeNextTurn, Units.Count);
+            //myGraphic.DrawText(10, 0, info, 16/*text size*/, new MyColor(128, 128, 128));
+        }
+
+        public virtual enLevelTouch OnTouch(IMyGraphic myGraphic, int xTouch, int yTouch)
 		{
 			// find button by mouse x,y
-			MyTexture2DAnimation? button = ButtonsInActionZone.Find(item => item?.GetRectInScenaPoints(myGraphic).Contains(xMouse, yMouse) ?? false);
+			MyTexture2DAnimation? button = ButtonsInActionZone.Find(item => item?.GetRectInScenaPoints(myGraphic).Contains(xTouch, yTouch) ?? false);
 			if (button != null)
 			{
 				ActiveButtonInActionZone = button;
-                return true;
+                return enLevelTouch.Handled;
 			}
 
 			// find background by mouse x,y
-			IBackgroundSquad background = BackgroundPictures.Find(item => item.GetRectInScenaPoints(myGraphic).Contains(xMouse, yMouse));
+			IBackgroundSquad background = BackgroundPictures.Find(item => item.GetRectInScenaPoints(myGraphic).Contains(xTouch, yTouch));
 			if (background != null)
-				return background.OnClickMouse(xMouse, yMouse, myGraphic, this);
+			{
+				background.OnClickMouse(xTouch, yTouch, myGraphic, this);
+                return enLevelTouch.Handled;
+            }
 
-			return false;
-		}
+			// click dialog button
+            if (ButtonNextLevel?.GetRectInScenaPoints(myGraphic).Contains(xTouch, yTouch) ?? false)
+            {
+                return enLevelTouch.LoadNextLevel;
+            }
 
-		public virtual void OnCreateUnit_WhenDeleteUnitWillAppear(IMyGraphic myGraphic, IUnitWillAppear gameUnitWillAppear)
-		{
-		}
+            return enLevelTouch.Handled;
+        }
 
-		protected int GetXCenterItemByColNumber(int col)
+        public virtual int GetXCenterItemByColNumber(int col)
 		{
 			return (col - 1) * PlayZoneItemSize.Width + LevelLeft + PlayZoneItemSize.Width / 2;
 		}
 
-		protected int GetYCenterItemByRowNumber(int row)
+        public virtual int GetYCenterItemByRowNumber(int row)
 		{
 			return (row - 1) * PlayZoneItemSize.Height + LevelTop + PlayZoneItemSize.Height / 2;
 		}
 
-		public int GetRow(MyRectangle rect)
+		public virtual int GetRow(MyRectangle rect)
 		{
 			int yCenter = (rect.Y + rect.Height / 2);
 			float y = yCenter - LevelTop;
@@ -278,7 +321,7 @@ namespace MyLevels
 			return (int)row;
 		}
 
-		public int GetCol(MyRectangle rect)
+		public virtual int GetCol(MyRectangle rect)
 		{
 			int xCenter = (rect.X + rect.Width / 2);
 			float x = xCenter - LevelLeft;
@@ -286,53 +329,51 @@ namespace MyLevels
 			return (int)col;
 		}
 
-		public IUnitWillAppear AddEnemyUnit(IMyGraphic myGraphic, double timeInSeconds, int row, enImageType imageType)
-		{
-			// time in seconds
-			int timeInMilliseconds = (int)(timeInSeconds * 1000);
-
-			// player ID
-			int playerID = GetComputerPlayerID();
-
-			// position
-			int xPosition = GetStartXPositionWhenUnitAppear();
-			int yPosition = GetStartYPositionWhenUnitAppear(row);
-
-			// create IMyUnitWillAppear
-			IUnitWillAppear myUnitWillAppear = new UnitWillAppear_Template(timeInMilliseconds, xPosition, yPosition, playerID, imageType);
-			
-			// result
-			return myUnitWillAppear;
-		}
-
-		public int GetStartXPositionWhenUnitAppear()
-		{
-			return GetXCenterItemByColNumber(GetCols()) + PlayZoneItemSize.Width / 2;
-		}
-
-		public int GetStartYPositionWhenUnitAppear(int row)
-		{
-			return GetYCenterItemByRowNumber(row);
-		}
-		
-		public virtual bool IsLevelEnd()
-		{
-			// check
-			if (UnitsWillAppear != null)
+        LevelInfo GetLevelInfo(int levelNumber)
+        {
+            Func<int, int, enImageType> funcBackground = (row, col) => (row + col) % 2 == 0 ? enImageType.Background_Level_Grass1 : enImageType.Background_Level_Grass2;
+            
+			if (levelNumber==1)
 			{
-				// check units will appear
-				if (UnitsWillAppear.Count == 0)
-				{
-					IUnit unitEnemy = Units.Find(item =>
+				return new LevelInfo(10, 1,
+					new enImageType[] { enImageType.Button_krolik_s_lukom },
+                    funcBackground,
+                    new IUnitWillAppear[]
 					{
-						return !IsTeam(item.PlayerID, GetMyPlayerID());
-					});
-
-					if (unitEnemy == null)
-						return true; // end level
-				}
+                        new UnitWillAppear_Template(2000 /*ms*/, 1 /*row*/, (myGraphic, xAppear,yAppear) => new Unit_EnemyZmeia(myGraphic, xAppear, yAppear)),
+                        new UnitWillAppear_Template(8000 /*ms*/, 1 /*row*/, (myGraphic, xAppear,yAppear) => new Unit_EnemyZmeia(myGraphic, xAppear, yAppear))
+                    }
+                );
 			}
-			return false;
+
+            else if (levelNumber == 2)
+            {
+                return new LevelInfo(10, 2,
+                    new enImageType[] { enImageType.Button_krolik_s_lukom },
+                    funcBackground,
+                    new IUnitWillAppear[]
+                    {
+                        new UnitWillAppear_Template(1000 /*ms*/, 1 /*row*/, (myGraphic, xAppear,yAppear) => new Unit_EnemyZmeia(myGraphic, xAppear, yAppear)),
+                        new UnitWillAppear_Template(8000 /*ms*/, 2 /*row*/, (myGraphic, xAppear,yAppear) => new Unit_EnemyBird1(myGraphic, xAppear, yAppear))
+                    }
+                );
+            }
+
+            else if (levelNumber == 3)
+            {
+                return new LevelInfo(10, 3,
+                    new enImageType[] { enImageType.Button_krolik_s_lukom },
+                    funcBackground,
+                    new IUnitWillAppear[]
+                    {
+                        new UnitWillAppear_Template(1000 /*ms*/, 1 /*row*/, (myGraphic, xAppear,yAppear) => new Unit_EnemyZmeia(myGraphic, xAppear, yAppear)),
+                        new UnitWillAppear_Template(2000 /*ms*/, 2 /*row*/, (myGraphic, xAppear,yAppear) => new Unit_EnemyPauk(myGraphic, xAppear, yAppear)),
+                        new UnitWillAppear_Template(8000 /*ms*/, 3 /*row*/, (myGraphic, xAppear,yAppear) => new Unit_EnemyZmeia(myGraphic, xAppear, yAppear))
+                    }
+                );
+            }
+            
+			return new LevelInfo(0, 0, new enImageType[] { }, funcBackground, new IUnitWillAppear[] { }); // empty
 		}
 	}
 }

@@ -13,12 +13,10 @@ namespace MyUnits
 		protected enImageType ImageTypeWhenDamage { get; set; }
         protected enImageType ImageTypeWhenMove { get; set; }
 
+		public bool IsMyFire { get; }
         public bool IsNeedDelete { get; set; }
 
         public int Damage { get; protected set; }
-
-        // multiplayer
-        public int PlayerID { get; protected set; }
 
 		// image
 		protected MyTexture2DAnimation MyTexture2DAnimation;
@@ -27,14 +25,14 @@ namespace MyUnits
 		public ITrajectory Trajectory { get; protected set; }
 
 		// weapon info
-		public Fire_Template(IMyGraphic myGraphic, int xCenter, int yCenter, ITrajectory myTrajectory, int damage, int playerID, enImageType imageTypeWhenMove, enImageType imageTypeWhenDamage)
+		public Fire_Template(IMyGraphic myGraphic, int xCenter, int yCenter, bool isMyFire, ITrajectory myTrajectory, int damage, enImageType imageTypeWhenMove, enImageType imageTypeWhenDamage)
 		{
             ImageTypeWhenMove = imageTypeWhenMove;
             ImageTypeWhenDamage = imageTypeWhenDamage;
 			Damage = damage;
 			IsNeedDelete = false;
-			PlayerID = playerID;
 			Trajectory = myTrajectory;
+			IsMyFire = isMyFire;
 
             IMyTexture2D myTexture2D = myGraphic.FindImage(enImageType.Fire_morkovka);
             MyTexture2DAnimation = new MyTexture2DAnimation(myTexture2D, xCenter, yCenter);
@@ -87,12 +85,11 @@ namespace MyUnits
 			MyRectangle rect = MyTexture2DAnimation.GetRectInScenaPoints(myGraphic);
 
 			// find collision Fire & Unit
-			IUnit unit = gameLevel.Units.Find(item =>
+			IUnit unit = gameLevel.EnemyUnits.Find(item =>
 			{
 				if (item.GetRectInScenaPoints(myGraphic).IntersectsWith(rect))
 				{
-					if (!gameLevel.IsTeam(PlayerID /*this player ID*/, item.PlayerID /*unit player ID*/))
-						return true;
+					return true;
 				}
 				return false;
 			});

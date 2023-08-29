@@ -66,7 +66,7 @@ namespace GameLogic
                 Exit();
 
             // skip
-            if (((long)gameTime.TotalGameTime.TotalMilliseconds - PrevTime) < myGame.GetTimeStepInMilliseconds())
+            if (((long)gameTime.TotalGameTime.TotalMilliseconds - PrevTime) < myGame.TimeStepInMilliseconds)
                 return;
 
             // set prev time
@@ -76,7 +76,7 @@ namespace GameLogic
             var mouseState = Mouse.GetState();
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
-                myGame.OnClickMouse(mouseState.X, mouseState.Y);
+                myGame.OnTouch(mouseState.X, mouseState.Y);
             }
             else
             {
@@ -86,7 +86,7 @@ namespace GameLogic
                 {
                     if (touch.State == Microsoft.Xna.Framework.Input.Touch.TouchLocationState.Pressed)
                     {
-                        myGame.OnClickMouse((int)touch.Position.X, (int)touch.Position.Y);
+                        myGame.OnTouch((int)touch.Position.X, (int)touch.Position.Y);
                     }
                 }
             }
@@ -106,7 +106,7 @@ namespace GameLogic
             // resize if changed width or height
             int screenWidth = graphics.GraphicsDevice.Viewport.Width;
             int screenHeight = graphics.GraphicsDevice.Viewport.Height;
-            if (myGame.MyGraphic.ScreenWidth != (int)screenWidth || myGame.MyGraphic.ScreenHeight != screenHeight)
+            if (myGraphic.ScreenWidth != screenWidth || myGraphic.ScreenHeight != screenHeight)
             {
                 myGame.OnChangeWindowSize(screenWidth, screenHeight);
             }

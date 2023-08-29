@@ -5,10 +5,10 @@ namespace MyUnits
 {
     class Unit_EnemyZmeia : Unit_Template_StopAndHitIfNearOtherUnit
     {
-        public Unit_EnemyZmeia(IMyGraphic myGraphic, int xCenterSource, int yCenterSource, int playerID) :
+        public Unit_EnemyZmeia(IMyGraphic myGraphic, int xCenterSource, int yCenterSource) :
             base(myGraphic,
                 xCenterSource, yCenterSource,
-                playerID /*playerID*/,
+                false /*is my unit*/,
                 40 /*life*/,
                 20 /*hand damage*/,
                 1000 /*1.5 second (time to make damage near)*/,

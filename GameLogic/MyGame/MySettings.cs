@@ -9,10 +9,8 @@ namespace MyGame
 	public static class MySettings
 	{
 		// load images
-		public static void LoadImages(this MyGame myGame, IMyGraphic Graphic)
+		public static void LoadImages(IMyGraphic Graphic)
 		{
-			enImageType imageType = enImageType.Unknown;
-
 			// load images (level)
 			Graphic.LoadImageFromFile("level/field_grass1.png", enImageType.Background_Level_Grass1);
 			Graphic.LoadImageFromFile("level/field_grass2.png", enImageType.Background_Level_Grass2);
@@ -41,9 +39,8 @@ namespace MyGame
 			Graphic.LoadImageFromFile("heroes/shenachi_patrul/zuma.png", enImageType.Heroes_zuma);
 
 			// load image & offsets
-			imageType = enImageType.Heroes_sobachka_run;
-			Graphic.LoadImageFromFile("heroes/sobachka_run/sobachka_run.png", imageType);
-			Graphic.FindImage(imageType).SpriteOffsets = new MyRectangle[]{
+			Graphic.LoadImageFromFile("heroes/sobachka_run/sobachka_run.png", enImageType.Heroes_sobachka_run);
+			Graphic.FindImage(enImageType.Heroes_sobachka_run).SpriteOffsets = new MyRectangle[]{
 				new MyRectangle(244, 3, 57, 42),
 				new MyRectangle(304, 4, 54, 39),
 				new MyRectangle(363, 4, 57, 38),
@@ -53,7 +50,6 @@ namespace MyGame
 			};
 
 			// load image & offsets
-			imageType = enImageType.Heroes_bird1_fly;
 			Graphic.LoadImageFromFile("heroes/bird/bird1.png", enImageType.Heroes_bird1_fly);
 
 			// load images (enemy heroes)
@@ -68,35 +64,17 @@ namespace MyGame
 			Graphic.LoadImageFromFile("heroes/fire/morkovka_splash.png", enImageType.Fire_morkovka_splash);
 		}
 
-		// get levels
-		public static IMyLevel[] GetLevels(this MyGame myGame)
-		{
-			return new IMyLevel[] { new MyLevel1(), new MyLevel2(), new MyLevel3(), new MyLevel4() };
-		}
-
 		// create my unit by button type
 		public static void CreateMyUnitWhenClickButton(this IMyLevel gameLevel, IMyGraphic myGraphic, int xCenter, int yCenter, enImageType buttonType)
 		{
 			if (buttonType == enImageType.Button_dog)
 			{
-				gameLevel.Units.Add(new Unit_DogGo(myGraphic, xCenter, yCenter, gameLevel.GetMyPlayerID()));
+				gameLevel.MyUnits.Add(new Unit_DogGo(myGraphic, xCenter, yCenter));
 			}
 			else if (buttonType == enImageType.Button_krolik_s_lukom)
 			{
-				gameLevel.Units.Add(new Unit_KrolikStayAndFire(myGraphic, xCenter, yCenter, gameLevel.GetMyPlayerID()));
+				gameLevel.MyUnits.Add(new Unit_KrolikStayAndFire(myGraphic, xCenter, yCenter));
 			}
 		}
-
-        public static void CreateEnemyUnit(this IMyLevel gameLevel, IMyGraphic myGraphic, int xCenter, int yCenter, int playerID, enImageType imageType)
-        {
-            if (imageType == enImageType.Heroes_zmeia_go)
-            {
-                gameLevel.Units.Add(new Unit_EnemyZmeia(myGraphic, xCenter, yCenter, playerID));
-            }
-            else if (imageType == enImageType.Heroes_bird1_fly)
-            {
-                gameLevel.Units.Add(new Unit_EnemyBird1(myGraphic, xCenter, yCenter, playerID));
-            }
-        }
     }
 }

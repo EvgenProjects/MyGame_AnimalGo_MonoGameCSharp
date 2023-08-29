@@ -33,18 +33,14 @@ namespace MyUnits
 				return false;
 
 			// find myHero here
-			IUnit myUnit = gameLevel.Units.Find(item =>
+			IUnit myUnit = gameLevel.MyUnits.Find(item =>
 			{
-				// is team
-				if (gameLevel.IsTeam(gameLevel.GetMyPlayerID(), item.PlayerID))
+				// is same row
+				if (gameLevel.GetRow(MyTexture2DAnimation.GetRectInScenaPoints(myGraphic)) == gameLevel.GetRow(item.GetRectInScenaPoints(myGraphic)))
 				{
-					// is same row
-					if (gameLevel.GetRow(MyTexture2DAnimation.GetRectInScenaPoints(myGraphic)) == gameLevel.GetRow(item.GetRectInScenaPoints(myGraphic)))
-					{
-						// has enemy unit on right
-						if (gameLevel.GetCol(MyTexture2DAnimation.GetRectInScenaPoints(myGraphic)) == gameLevel.GetCol(item.GetRectInScenaPoints(myGraphic)))
-							return true;
-					}
+					// has enemy unit on right
+					if (gameLevel.GetCol(MyTexture2DAnimation.GetRectInScenaPoints(myGraphic)) == gameLevel.GetCol(item.GetRectInScenaPoints(myGraphic)))
+						return true;
 				}
 
 				return false;

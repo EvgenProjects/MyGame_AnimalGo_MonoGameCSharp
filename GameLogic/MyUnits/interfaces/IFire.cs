@@ -7,8 +7,7 @@ namespace MyUnits.interfaces
 	{
 		bool IsNeedDelete { get; set; }
 
-		// multiplayer
-		int PlayerID { get; }
+		bool IsMyFire { get; }
 
 		// trajectory
 		ITrajectory Trajectory { get; }

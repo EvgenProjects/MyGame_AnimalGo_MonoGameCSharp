@@ -9,25 +9,25 @@ namespace MyUnits
 	class Unit_Template_FireOnDistanceIfSeeEnemyUnit : IUnit
 	{
         public MyTexture2DAnimation MyTexture2DAnimation;
-        public virtual int PlayerID { get; protected set; }
         public int Life { get; set; }
         public bool IsNeedDelete { get; set; }
         public int HandDamage { get; protected set; }
         public ITrajectory Trajectory { get; protected set; }
+        public bool IsMyUnit { get; }
 
         public Func<MyPoint, IFire> DelegateMakeFire;
         protected long LastTimeWhenMadeFireInMilliseconds = 0;
 		protected long TimeToMakeFire = 0;
 
 		// constructor
-		public Unit_Template_FireOnDistanceIfSeeEnemyUnit(IMyGraphic myGraphic, int xCenter, int yCenter, int playerID, int life, long timeToMakeFire, enImageType imageTypeWhenStay)
+		public Unit_Template_FireOnDistanceIfSeeEnemyUnit(IMyGraphic myGraphic, int xCenter, int yCenter, bool isMyUnit, int life, long timeToMakeFire, enImageType imageTypeWhenStay)
         {
-            PlayerID = playerID;
             Life = life;
             HandDamage = 0;
             Trajectory = null;
             IsNeedDelete = false;
             TimeToMakeFire = timeToMakeFire;
+			IsMyUnit = isMyUnit;
 
             IMyTexture2D myTexture2D = myGraphic.FindImage(imageTypeWhenStay);
             MyTexture2DAnimation = new MyTexture2DAnimation(myTexture2D, xCenter, yCenter);
@@ -70,8 +70,9 @@ namespace MyUnits
 			if ((timeInMilliseconds - LastTimeWhenMadeFireInMilliseconds) < TimeToMakeFire)
 				return;
 
-			// can fire for unit?
-			IUnit enemyUnit = gameLevel.Units.Find(item => CanFireOnThisUnit(item, myGraphic, gameLevel));
+            // can fire for unit?
+            var unitsForFight = IsMyUnit ? gameLevel.EnemyUnits : gameLevel.MyUnits;
+            IUnit enemyUnit = unitsForFight.Find(item => CanFireOnThisUnit(item, myGraphic, gameLevel));
 
 			// found unit to fire
 			if (enemyUnit == null)
@@ -86,10 +87,6 @@ namespace MyUnits
 	
 		public virtual bool CanFireOnThisUnit(IUnit unit, IMyGraphic myGraphic, IMyLevel gameLevel)
 		{
-			// is team
-			if (gameLevel.IsTeam(PlayerID, unit.PlayerID))
-				return false;
-
 			// is same row
 			if (gameLevel.GetRow(MyTexture2DAnimation.GetRectInScenaPoints(myGraphic)) == gameLevel.GetRow(unit.GetRectInScenaPoints(myGraphic)))
 			{
@@ -107,7 +104,8 @@ namespace MyUnits
 			if (DelegateMakeFire!=null)
 			{
 				IFire myFire = DelegateMakeFire(new MyPoint(rect.X + rect.Width / 2, rect.Y + rect.Height / 2));
-				gameLevel.Fires.Add(myFire);
+                var fires = IsMyUnit ? gameLevel.MyFires : gameLevel.EnemyFires;
+                fires.Add(myFire);
 			}
 		}
         

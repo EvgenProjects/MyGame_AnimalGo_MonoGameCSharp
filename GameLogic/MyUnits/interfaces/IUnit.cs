@@ -10,8 +10,7 @@ namespace MyUnits.interfaces
 		// trajectory
 		ITrajectory Trajectory { get; }
 
-		// multiplayer
-		int PlayerID { get; }
+		bool IsMyUnit { get; }
 
 		// Life
 		int Life { get; set; }
