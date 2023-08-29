@@ -38,7 +38,7 @@ namespace MyUnits
 				return;
 
             // Create Unit from UnitWillAppear
-            int xAppear = gameLevel.GetXCenterItemByColNumber(gameLevel.LevelInfo.ColsCount+1);
+            int xAppear = gameLevel.GetXCenterItemByColNumber(gameLevel.LevelDetails.ColsCount+1);
             int yAppear = gameLevel.GetYCenterItemByRowNumber(_row);
             IUnit unit = _funcCreateUnit(myGraphic, xAppear, yAppear);
 			gameLevel.EnemyUnits.Add(unit);

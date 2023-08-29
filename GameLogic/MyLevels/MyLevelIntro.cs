@@ -28,9 +28,7 @@ namespace MyLevels
 
 		public virtual void OnLoad(IMyGraphic myGraphic)
         {
-			int xCenter = LevelWidth / 2;
-            int yCenter = LevelHeight / 2;
-            Buttons.Add(new MyTexture2DAnimation(myGraphic.FindImage(enImageType.Button_level_first), xCenter, yCenter));
+            Buttons.Add(new MyTexture2DAnimation(myGraphic.FindImage(enImageType.PopupWindow_level_first), LevelWidth/2, LevelHeight/2));
         }
 
 		public virtual void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic)

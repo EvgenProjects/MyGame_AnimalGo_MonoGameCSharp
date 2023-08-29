@@ -1,5 +1,6 @@
 ﻿using MyGame.interfaces;
 using MyLevels;
+using System.Threading;
 
 namespace MyGame
 {
@@ -105,8 +106,11 @@ namespace MyGame
 
             else if (_levelType >= enLevelType.LevelStart && _levelType <= enLevelType.LevelEnd)
             {
-                if (_myLevel.OnTouch(_myGraphic, (int)ptMouseInScenaPoints.X, (int)ptMouseInScenaPoints.Y) == enLevelTouch.LoadNextLevel)
+                enLevelTouch levelTouch = _myLevel.OnTouch(_myGraphic, (int)ptMouseInScenaPoints.X, (int)ptMouseInScenaPoints.Y);
+                if (levelTouch == enLevelTouch.LoadNextLevel)
                     LoadNextLevel();
+                else if (levelTouch == enLevelTouch.LoadLevelIntro)
+                    LoadLevelIntro();
             }
 		}
 	}

@@ -5,13 +5,15 @@ using MyGame.interfaces;
 using MyLevels.interfaces;
 using MyUnits;
 using MyGame;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MyLevels
 {
     enum enLevelTouch
     {
         Handled = 0,
-        LoadNextLevel = 1
+        LoadNextLevel = 1,
+        LoadLevelIntro = 2
     }
     
 	class MyLevel : IMyLevel
@@ -29,9 +31,11 @@ namespace MyLevels
 
         // dialogs
         public MyTexture2DAnimation? ButtonNextLevel { get; protected set; }
+        public MyTexture2DAnimation? ButtonAllLevelsFinished { get; protected set; }
 
         // level info
-        public virtual LevelInfo LevelInfo { get; protected set; }
+        public virtual LevelDetails LevelDetails { get; protected set; }
+        protected bool IsNextLevelAbsent = false;
 
         // objects
         public List<IUnit> MyUnits { get; protected set; }
@@ -56,17 +60,18 @@ namespace MyLevels
             UnitsWillAppear = new List<IUnitWillAppear>();
             AnimPicturesDieByTime = new List<IAnimPictureDieByTime>();
             ButtonNextLevel = null; // create when all enemy units destroied
-		}
+            ButtonAllLevelsFinished = null; // create when all levels finished
+        }
 
-		// load
-		public virtual void OnLoad(IMyGraphic myGraphic, int levelNumber)
-		{
-            LevelInfo = GetLevelInfo(levelNumber);
-
+        public virtual void Clear()
+        {
             ButtonNextLevel?.Unload();
             ButtonNextLevel = null;
-            
-			MyUnits.Clear();
+
+            ButtonAllLevelsFinished?.Unload();
+            ButtonAllLevelsFinished = null;
+
+            MyUnits.Clear();
             EnemyUnits.Clear();
             MyFires.Clear();
             EnemyFires.Clear();
@@ -74,24 +79,33 @@ namespace MyLevels
             ButtonsInActionZone.Clear();
             UnitsWillAppear.Clear();
             AnimPicturesDieByTime.Clear();
+        }
+
+        // load
+        public virtual void OnLoad(IMyGraphic myGraphic, int levelNumber)
+		{
+            Clear();
+
+            LevelDetails = LoadLevel(levelNumber);
+            IsNextLevelAbsent = LoadLevel(levelNumber+1).UnitsWillAppear.Length==0;
 
             LoadBackground(myGraphic);
-			LoadButtons(myGraphic);
-			LoadUnitsWillAppear(myGraphic);
-		}
+            LoadButtons(myGraphic);
+            LoadUnitsWillAppear(myGraphic);
+        }
 
-		public void LoadBackground(IMyGraphic myGraphic)
+        public void LoadBackground(IMyGraphic myGraphic)
 		{
 			enImageType imageType;
 			IMyTexture2D myTexture2D;
 
             // add level background
-            for (int col = 1; col <= LevelInfo.ColsCount; col++)
+            for (int col = 1; col <= LevelDetails.ColsCount; col++)
 			{
-				for (int row = 1; row <= LevelInfo.RowsCount; row++)
+				for (int row = 1; row <= LevelDetails.RowsCount; row++)
 				{
-					// image type
-					imageType = LevelInfo.FuncBackgroundImageType(row, col);
+                    // image LevelDetails
+                    imageType = LevelDetails.FuncBackgroundImageType(row, col);
 
 					// x,y
 					int x = GetXCenterItemByColNumber(col);
@@ -111,7 +125,7 @@ namespace MyLevels
 				imageType = enImageType.Background_Bottom;
                 myTexture2D = myGraphic.FindImage(imageType);
 				int xLeftBackground = LevelLeft + myTexture2D.sizeSource.Width * (col - 1);
-				int yBottomBackground = GetYCenterItemByRowNumber(LevelInfo.RowsCount) + PlayZoneItemSize.Height / 2 + myTexture2D.sizeSource.Height;
+				int yBottomBackground = GetYCenterItemByRowNumber(LevelDetails.RowsCount) + PlayZoneItemSize.Height / 2 + myTexture2D.sizeSource.Height;
 				BackgroundPictures.Add(new BackgroundSquad_Template(new MyTexture2DAnimation(myTexture2D, xLeftBackground + myTexture2D.sizeSource.Width / 2, yBottomBackground - myTexture2D.sizeSource.Height/2)));
 			}
 		}
@@ -119,11 +133,11 @@ namespace MyLevels
 		public void LoadButtons(IMyGraphic myGraphic)
 		{
 			// get buttons
-			enImageType[] buttonsID = LevelInfo.Buttons;
+			enImageType[] buttonsID = LevelDetails.Buttons;
 
 			// get x,y for buttons
 			int xCenter = GetXCenterItemByColNumber(1);
-            int yCenter = GetYCenterItemByRowNumber(LevelInfo.RowsCount + 1) + GetYCenterItemByRowNumber(1)/2;
+            int yCenter = GetYCenterItemByRowNumber(LevelDetails.RowsCount + 1) + GetYCenterItemByRowNumber(1)/2;
 
 			// enum buttons
 			foreach (enImageType buttonID in buttonsID)
@@ -142,7 +156,7 @@ namespace MyLevels
 			UnitsWillAppear.Clear();
 
 			// add
-			UnitsWillAppear.AddRange(LevelInfo.UnitsWillAppear);
+			UnitsWillAppear.AddRange(LevelDetails.UnitsWillAppear);
 		}
 
 		public virtual void OnNextTurn(long timeInMilliseconds, IMyGraphic myGraphic)
@@ -157,13 +171,20 @@ namespace MyLevels
 			// is level end
 			if (UnitsWillAppear.Count == 0 && EnemyUnits.Count == 0)
 			{
-				if (ButtonNextLevel==null)
-				{
-					int xCenter = LevelWidth / 2;
-					int yCenter = LevelHeight / 2;
-                    ButtonNextLevel = new MyTexture2DAnimation(myGraphic.FindImage(enImageType.Button_level_next), xCenter, yCenter);
-				}
-				return;
+                // show dialog "All levels finished"
+                if (IsNextLevelAbsent)
+                {
+                    if (ButtonAllLevelsFinished == null)
+                        ButtonAllLevelsFinished = new MyTexture2DAnimation(myGraphic.FindImage(enImageType.PopupWindow_all_levels_finished), LevelWidth / 2, LevelHeight / 2);
+                    return;
+                }
+                // show dialog "Next Level"
+                else
+                {
+                    if (ButtonNextLevel == null)
+                        ButtonNextLevel = new MyTexture2DAnimation(myGraphic.FindImage(enImageType.PopupWindow_level_next), LevelWidth / 2, LevelHeight / 2);
+                    return;
+                }
             }
 
             // my Units
@@ -270,6 +291,7 @@ namespace MyLevels
 
             // Buttons
             ButtonNextLevel?.OnDraw(myGraphic);
+            ButtonAllLevelsFinished?.OnDraw(myGraphic);
 
             // statistic
             //string info = string.Format("NextTurn time={0} , Units count={1}", HowMuchTimeInMilliseconds_TakeNextTurn, Units.Count);
@@ -278,8 +300,20 @@ namespace MyLevels
 
         public virtual enLevelTouch OnTouch(IMyGraphic myGraphic, int xTouch, int yTouch)
 		{
-			// find button by mouse x,y
-			MyTexture2DAnimation? button = ButtonsInActionZone.Find(item => item?.GetRectInScenaPoints(myGraphic).Contains(xTouch, yTouch) ?? false);
+            // click dialog button
+            if (ButtonNextLevel?.GetRectInScenaPoints(myGraphic).Contains(xTouch, yTouch) ?? false)
+            {
+                Clear();
+                return enLevelTouch.LoadNextLevel;
+            }
+            else if (ButtonAllLevelsFinished?.GetRectInScenaPoints(myGraphic).Contains(xTouch, yTouch) ?? false)
+            {
+                Clear();
+                return enLevelTouch.LoadLevelIntro;
+            }
+            
+            // find button by mouse x,y
+            MyTexture2DAnimation? button = ButtonsInActionZone.Find(item => item?.GetRectInScenaPoints(myGraphic).Contains(xTouch, yTouch) ?? false);
 			if (button != null)
 			{
 				ActiveButtonInActionZone = button;
@@ -292,12 +326,6 @@ namespace MyLevels
 			{
 				background.OnClickMouse(xTouch, yTouch, myGraphic, this);
                 return enLevelTouch.Handled;
-            }
-
-			// click dialog button
-            if (ButtonNextLevel?.GetRectInScenaPoints(myGraphic).Contains(xTouch, yTouch) ?? false)
-            {
-                return enLevelTouch.LoadNextLevel;
             }
 
             return enLevelTouch.Handled;
@@ -329,13 +357,13 @@ namespace MyLevels
 			return (int)col;
 		}
 
-        LevelInfo GetLevelInfo(int levelNumber)
+        LevelDetails LoadLevel(int levelNumber)
         {
             Func<int, int, enImageType> funcBackground = (row, col) => (row + col) % 2 == 0 ? enImageType.Background_Level_Grass1 : enImageType.Background_Level_Grass2;
             
 			if (levelNumber==1)
 			{
-				return new LevelInfo(10, 1,
+				return new LevelDetails(10, 1,
 					new enImageType[] { enImageType.Button_krolik_s_lukom },
                     funcBackground,
                     new IUnitWillAppear[]
@@ -348,7 +376,7 @@ namespace MyLevels
 
             else if (levelNumber == 2)
             {
-                return new LevelInfo(10, 2,
+                return new LevelDetails(10, 2,
                     new enImageType[] { enImageType.Button_krolik_s_lukom },
                     funcBackground,
                     new IUnitWillAppear[]
@@ -361,7 +389,7 @@ namespace MyLevels
 
             else if (levelNumber == 3)
             {
-                return new LevelInfo(10, 3,
+                return new LevelDetails(10, 3,
                     new enImageType[] { enImageType.Button_krolik_s_lukom },
                     funcBackground,
                     new IUnitWillAppear[]
@@ -373,7 +401,7 @@ namespace MyLevels
                 );
             }
             
-			return new LevelInfo(0, 0, new enImageType[] { }, funcBackground, new IUnitWillAppear[] { }); // empty
+			return new LevelDetails(0, 0, new enImageType[] { }, funcBackground, new IUnitWillAppear[] { }); // empty
 		}
 	}
 }

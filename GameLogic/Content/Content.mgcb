@@ -405,7 +405,7 @@
 /processorParam:TextureFormat=Color
 /build:level/filed_left_baza_src.png
 
-#begin buttons/button_level_first.png
+#begin popup_windows/window_level_first.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -415,9 +415,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:buttons/button_level_first.png
+/build:popup_windows/window_level_first.png
 
-#begin buttons/button_level_next.png
+#begin popup_windows/window_level_next.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -427,7 +427,19 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:buttons/button_level_next.png
+/build:popup_windows/window_level_next.png
+
+#begin popup_windows/window_all_levels_finished.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:popup_windows/window_all_levels_finished.png
 
 #begin heroes/bird/bird1.png
 /importer:TextureImporter

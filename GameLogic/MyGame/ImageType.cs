@@ -4,8 +4,13 @@
 	{
 		Unknown = 0,
 
+        // Popup windows
+        PopupWindow_level_first,
+        PopupWindow_level_next,
+        PopupWindow_all_levels_finished,
+        
 		// background
-		Background_Level_Grass1,
+        Background_Level_Grass1,
 		Background_Level_Grass2,
 		Background_Bottom,
 		Background_left_baza,
@@ -15,11 +20,9 @@
 		Button_krolik_s_lukom,
 		Button_restart,
 		Button_dog,
-		Button_level_first,
-		Button_level_next,
 
-		// my heroes
-		Heroes_krolik_s_lukom,
+        // my heroes
+        Heroes_krolik_s_lukom,
 		Heroes_griadka,
 		Heroes_griadka1,
 		Heroes_griadka2,

@@ -6,14 +6,14 @@ using System.Collections.Generic; // for List
 
 namespace MyLevels.interfaces
 {
-    public struct LevelInfo
+    public struct LevelDetails
     {
         public int ColsCount;
         public int RowsCount;
         public enImageType[] Buttons;
         public Func<int, int, enImageType> FuncBackgroundImageType;
         public IUnitWillAppear[] UnitsWillAppear;
-        public LevelInfo(int colsCount, int rowsCount, enImageType[] buttons, Func<int, int, enImageType> funcBackgroundImageType, IUnitWillAppear[] unitsWillAppear)
+        public LevelDetails(int colsCount, int rowsCount, enImageType[] buttons, Func<int, int, enImageType> funcBackgroundImageType, IUnitWillAppear[] unitsWillAppear)
         {
             ColsCount = colsCount;
             RowsCount = rowsCount;
@@ -25,11 +25,13 @@ namespace MyLevels.interfaces
     
     public interface IMyLevel
 	{
-        LevelInfo LevelInfo { get; }
+        LevelDetails LevelDetails { get; }
         int LevelWidth { get; }
         int LevelHeight { get; }
         int LevelLeft { get; }
         int LevelTop { get; }
+
+        void Clear();
 
         int GetRow(MyRectangle rect);
         int GetCol(MyRectangle rect);

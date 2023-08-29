@@ -11,8 +11,13 @@ namespace MyGame
 		// load images
 		public static void LoadImages(IMyGraphic Graphic)
 		{
-			// load images (level)
-			Graphic.LoadImageFromFile("level/field_grass1.png", enImageType.Background_Level_Grass1);
+            // Popup windows
+            Graphic.LoadImageFromFile("popup_windows/window_level_first.png", enImageType.PopupWindow_level_first);
+            Graphic.LoadImageFromFile("popup_windows/window_level_next.png", enImageType.PopupWindow_level_next);
+            Graphic.LoadImageFromFile("popup_windows/window_all_levels_finished.png", enImageType.PopupWindow_all_levels_finished);
+
+            // load images (level)
+            Graphic.LoadImageFromFile("level/field_grass1.png", enImageType.Background_Level_Grass1);
 			Graphic.LoadImageFromFile("level/field_grass2.png", enImageType.Background_Level_Grass2);
 			Graphic.LoadImageFromFile("level/field_bottom.png", enImageType.Background_Bottom);
 			Graphic.LoadImageFromFile("level/filed_left_baza.png", enImageType.Background_left_baza);
@@ -22,8 +27,6 @@ namespace MyGame
 			Graphic.LoadImageFromFile("buttons/button_krolik_s_lukom.png", enImageType.Button_krolik_s_lukom);
 			Graphic.LoadImageFromFile("buttons/button_restart.png", enImageType.Button_restart);
 			Graphic.LoadImageFromFile("buttons/button_dog.png", enImageType.Button_dog);
-			Graphic.LoadImageFromFile("buttons/button_level_first.png", enImageType.Button_level_first);
-			Graphic.LoadImageFromFile("buttons/button_level_next.png", enImageType.Button_level_next);
 
 			// load images (my heroes)
 			Graphic.LoadImageFromFile("heroes/krolik/krolik_s_lukom.png", enImageType.Heroes_krolik_s_lukom);
